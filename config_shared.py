@@ -13,19 +13,33 @@ from typing import Any, Dict, List, Literal, Optional, Sequence
 
 
 # Model defaults/options
-DEFAULT_MODEL = "gpt-5.1"
-OPENAI_MODEL_OPTIONS = ["gpt-5", "gpt-5.1", "gpt-5.2", "gpt-5-mini", "gpt-5-nano"]
+DEFAULT_MODEL = "gpt-5.4"
+OPENAI_MODEL_OPTIONS = [
+    "gpt-5.4",
+    "gpt-5.4-mini",
+    "gpt-5.4-nano",
+    "gpt-5.2",
+    "gpt-5.1",
+    "gpt-5",
+    "gpt-5-mini",
+    "gpt-5-nano",
+]
 CLAUDE_MODEL_OPTIONS = [
-    "claude-sonnet-4-6",
-    "claude-sonnet-4-5",
-    "claude-sonnet-4",
     "claude-opus-4-6",
+    "claude-sonnet-4-6",
+    "claude-haiku-4-5",
+    "claude-sonnet-4-5",
     "claude-opus-4-5",
     "claude-opus-4-1",
-    "claude-haiku-4-5",
-    "claude-3-5-haiku-latest",
+    "claude-sonnet-4-0",
 ]
-MODEL_OPTIONS = OPENAI_MODEL_OPTIONS + CLAUDE_MODEL_OPTIONS
+GEMINI_MODEL_OPTIONS = [
+    "gemini-2.5-pro",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+]
+GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
+MODEL_OPTIONS = OPENAI_MODEL_OPTIONS + CLAUDE_MODEL_OPTIONS + GEMINI_MODEL_OPTIONS
 
 # Shared timing/token defaults
 DEFAULT_MAX_TOKENS_MARGIN = 512
@@ -388,10 +402,12 @@ SHARED_ARG_SPECS: Sequence[SharedArgSpec] = (
 )
 
 
-def infer_model_provider(model_name: str) -> Literal["openai", "anthropic"]:
+def infer_model_provider(model_name: str) -> Literal["openai", "anthropic", "gemini"]:
     model = (model_name or "").strip().lower()
     if model.startswith("claude") or model.startswith("anthropic."):
         return "anthropic"
+    if model.startswith("gemini"):
+        return "gemini"
     return "openai"
 
 
@@ -399,6 +415,8 @@ def model_api_env_var(model_name: str) -> str:
     provider = infer_model_provider(model_name)
     if provider == "anthropic":
         return "ANTHROPIC_API_KEY"
+    if provider == "gemini":
+        return "GEMINI_API_KEY"
     return "OPENAI_API_KEY"
 
 

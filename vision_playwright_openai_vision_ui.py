@@ -510,14 +510,16 @@ def main() -> None:
     build_action_settings_tab(tab_actions, vars_map)
     build_output_tab(tab_output, vars_map)
 
-    openai_key_var, anthropic_key_var, _apply_api_key = build_credentials_tab(
-        tab_creds,
-        root=root,
-        vars_map=vars_map,
-        add_section_title=_add_section_title,
-        add_field_help=_add_field_help,
-        add_labeled_entry=_add_labeled_entry,
-        add_labeled_password=_add_labeled_password,
+    openai_key_var, anthropic_key_var, gemini_key_var, _apply_api_key = (
+        build_credentials_tab(
+            tab_creds,
+            root=root,
+            vars_map=vars_map,
+            add_section_title=_add_section_title,
+            add_field_help=_add_field_help,
+            add_labeled_entry=_add_labeled_entry,
+            add_labeled_password=_add_labeled_password,
+        )
     )
 
     log_text, continue_button, log_container = build_run_log_panel(
@@ -562,6 +564,7 @@ def main() -> None:
         continue_button=continue_button,
         openai_key_var=openai_key_var,
         anthropic_key_var=anthropic_key_var,
+        gemini_key_var=gemini_key_var,
     )
 
     app.continue_button.configure(command=lambda: _send_step_training_continue(app))

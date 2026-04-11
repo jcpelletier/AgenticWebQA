@@ -78,7 +78,26 @@
       "Bash(python -m mypy ui/ui_prompt_tabs.py)",
       "Bash(python -m ruff format ui/ui_prompt_tabs.py)",
       "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(f['name'], '->', [s.get\\('action','?'\\), s.get\\('text',''\\)[:30] if 'text' in s else s.get\\('selector',''\\)[:50] if 'selector' in s else ''] \\) for f in d.get\\('functions',[]\\) for s in f.get\\('steps',[]\\)]\")",
-      "Bash(python -c \"import json; d=json.load\\(open\\('c:/Users/genes/GitHub/AgenticWebQAJP/Models/https_tv_jpelletier_com.json'\\)\\); print\\(json.dumps\\(d, indent=2\\)\\)\")"
+      "Bash(python -c \"import json; d=json.load\\(open\\('c:/Users/genes/GitHub/AgenticWebQAJP/Models/https_tv_jpelletier_com.json'\\)\\); print\\(json.dumps\\(d, indent=2\\)\\)\")",
+      "Bash(xargs grep:*)",
+      "Bash(xargs wc:*)",
+      "Bash(grep -n \"build_credentials_tab\" /c/Users/genes/GitHub/AgenticWebQAJP/ui/*.py)",
+      "Bash(ls -la /c/Users/genes/GitHub/AgenticWebQAJP/tests/test_*.py)",
+      "Bash(grep -l \"infer_model_provider\\\\|model_api_env_var\" tests/*.py)",
+      "Bash(python -m pytest tests/test_claude_support_contract.py -v)",
+      "Bash(python -m pytest tests/test_shared_arg_validation.py -v)",
+      "Bash(python -m pytest tests/test_cli_smoke.py -v)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(find /c/Users/genes/GitHub/AgenticWebQAJP -type f \\\\\\( -name \"*.py\" -o -name \"*.md\" \\\\\\) -exec grep -l -i \"gemini\" {} \\\\;)",
+      "Bash(python -m pytest -q tests/test_gemini_provider.py)",
+      "WebSearch",
+      "WebFetch(domain:platform.openai.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:developers.openai.com)",
+      "WebFetch(domain:ai.google.dev)",
+      "Bash(python -m pytest tests/test_gemini_provider.py -v)",
+      "Bash(python -m pytest --tb=short -q)",
+      "Bash(python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash)"
     ],
     "additionalDirectories": [
       "c:\\Users\\genes\\GitHub\\AgenticWebQA"
