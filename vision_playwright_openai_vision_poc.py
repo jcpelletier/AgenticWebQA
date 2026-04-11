@@ -61,6 +61,7 @@ from config_shared import (
     DEFAULT_MODEL,
     DEFAULT_X_SIZE_PX,
     DEFAULT_X_THICKNESS_PX,
+    GEMINI_BASE_URL,
     SuccessIndicatorConfig,
     SuccessIndicatorType,
     infer_model_provider,
@@ -86,6 +87,15 @@ def _new_openai_client(api_key: str) -> OpenAIClient:
             "openai.OpenAI is unavailable. Upgrade the openai package to a version that provides OpenAI client."
         )
     return cast(OpenAIClient, client_factory(api_key=api_key))
+
+
+def _new_gemini_client(api_key: str) -> OpenAIClient:
+    client_factory = OpenAI
+    if client_factory is None:
+        raise RuntimeError(
+            "openai.OpenAI is unavailable. Upgrade the openai package to a version that provides OpenAI client."
+        )
+    return cast(OpenAIClient, client_factory(api_key=api_key, base_url=GEMINI_BASE_URL))
 
 
 def _new_anthropic_client(api_key: str) -> AnthropicClient:
@@ -129,12 +139,130 @@ class _UnifiedResponse:
         }
 
 
+def _responses_req_to_chat_completions_req(req: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert a Responses API request dict to a Chat Completions request dict.
+
+    Gemini's OpenAI-compatible endpoint only supports /chat/completions, not
+    /responses.  This function translates the request shape so we can call
+    client.chat.completions.create() instead.
+    """
+    chat_req: Dict[str, Any] = {}
+
+    chat_req["model"] = req.get("model")
+
+    # max_output_tokens (Responses API) → max_tokens (Chat Completions)
+    if "max_output_tokens" in req:
+        chat_req["max_tokens"] = int(req["max_output_tokens"])
+
+    # Convert input list → messages list
+    input_items = req.get("input") or []
+    messages: List[Dict[str, Any]] = []
+    for item in input_items:
+        if not isinstance(item, dict):
+            continue
+        role = str(item.get("role") or "user").strip().lower()
+        raw_content = item.get("content")
+        if isinstance(raw_content, str):
+            messages.append({"role": role, "content": raw_content})
+            continue
+        if not isinstance(raw_content, list):
+            continue
+        parts: List[Dict[str, Any]] = []
+        for block in raw_content:
+            if not isinstance(block, dict):
+                continue
+            btype = str(block.get("type") or "").strip().lower()
+            if btype in ("input_text", "output_text", "text"):
+                parts.append({"type": "text", "text": str(block.get("text") or "")})
+            elif btype == "input_image":
+                image_url = str(block.get("image_url") or "")
+                parts.append(
+                    {"type": "image_url", "image_url": {"url": image_url}}
+                )
+        if not parts:
+            continue
+        # Simplify to a plain string for non-user/single-text messages
+        if len(parts) == 1 and parts[0]["type"] == "text" and role != "user":
+            messages.append({"role": role, "content": parts[0]["text"]})
+        else:
+            messages.append({"role": role, "content": parts})
+    if messages:
+        chat_req["messages"] = messages
+
+    # response_format: Gemini's OpenAI-compatible endpoint supports json_object
+    # but not the full json_schema type (additionalProperties etc. are ignored/broken).
+    # Convert json_schema → json_object so the model returns valid JSON without
+    # schema enforcement; the prompts already specify the expected structure.
+    if "response_format" in req:
+        rf = req["response_format"]
+        if isinstance(rf, dict) and rf.get("type") == "json_schema":
+            chat_req["response_format"] = {"type": "json_object"}
+        else:
+            chat_req["response_format"] = rf
+
+    # Gemini needs more headroom than gpt-style models for JSON output.
+    # Bump small token budgets so the model can complete structured responses.
+    _GEMINI_MIN_JSON_TOKENS = 256
+    if "max_tokens" in chat_req and int(chat_req["max_tokens"]) < _GEMINI_MIN_JSON_TOKENS:
+        has_json_output = "response_format" in chat_req
+        if has_json_output:
+            chat_req["max_tokens"] = _GEMINI_MIN_JSON_TOKENS
+
+    # Drop Responses-API-only fields: reasoning, previous_response_id
+    return chat_req
+
+
+class _ChatCompletionsUsageWrapper:
+    """Adapts a Chat Completions usage object to look like a Responses API usage."""
+
+    def __init__(self, usage: Any) -> None:
+        pt = getattr(usage, "prompt_tokens", None) if usage is not None else None
+        ct = getattr(usage, "completion_tokens", None) if usage is not None else None
+        self.input_tokens: Optional[int] = int(pt) if isinstance(pt, (int, float)) else None
+        self.output_tokens: Optional[int] = int(ct) if isinstance(ct, (int, float)) else None
+        self.cache_creation_input_tokens: Optional[int] = None
+        self.cache_read_input_tokens: Optional[int] = None
+
+
+class _ChatCompletionsResponseWrapper:
+    """Wraps a Chat Completions response to look like a Responses API response.
+
+    This lets extract_openai_response_text(), print_usage_tokens(), and all
+    other Responses-API consumers work unchanged when talking to Gemini.
+    """
+
+    def __init__(self, cc_resp: Any) -> None:
+        choice = (
+            (cc_resp.choices[0] if cc_resp.choices else None)
+            if hasattr(cc_resp, "choices")
+            else None
+        )
+        content = ""
+        if choice is not None:
+            msg = getattr(choice, "message", None)
+            if msg is not None:
+                content = getattr(msg, "content", None) or ""
+        self.output_text: str = content if isinstance(content, str) else ""
+        self.output: List[Dict[str, Any]] = [
+            {
+                "type": "message",
+                "content": [{"type": "output_text", "text": self.output_text}],
+            }
+        ]
+        self.usage = _ChatCompletionsUsageWrapper(getattr(cc_resp, "usage", None))
+        self.id: Optional[str] = getattr(cc_resp, "id", None)
+
+
 class _ResponsesAdapter:
     def __init__(self, provider: str, client: Any) -> None:
         self._provider = provider
         self._client = client
 
     def create(self, **req: Any) -> Any:
+        if self._provider == "gemini":
+            chat_req = _responses_req_to_chat_completions_req(req)
+            cc_resp = self._client.chat.completions.create(**chat_req)
+            return _ChatCompletionsResponseWrapper(cc_resp)
         if self._provider == "openai":
             return self._client.responses.create(**req)
         return _anthropic_create_normalized_response(self._client, req)
@@ -290,6 +418,8 @@ def _new_model_client(model_name: str, api_key: str) -> _ModelClientAdapter:
     provider = infer_model_provider(model_name)
     if provider == "anthropic":
         return _ModelClientAdapter("anthropic", _new_anthropic_client(api_key))
+    if provider == "gemini":
+        return _ModelClientAdapter("gemini", _new_gemini_client(api_key))
     return _ModelClientAdapter("openai", _new_openai_client(api_key))
 
 
@@ -524,7 +654,9 @@ class RunOutcome:
     error: Optional[str] = None
 
 
-def _check_text_present(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0) -> bool:
+def _check_text_present(
+    page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0
+) -> bool:
     """True if config.value (or compiled regex) found in page visible text.
 
     When timeout_ms > 0 and the value is a plain string, uses wait_for_function so
@@ -550,7 +682,9 @@ def _check_text_present(page: Page, config: SuccessIndicatorConfig, *, timeout_m
     return config.value in body_text
 
 
-def _check_selector_present(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0) -> bool:
+def _check_selector_present(
+    page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0
+) -> bool:
     """True if the CSS selector in config.value matches at least one element.
 
     When timeout_ms > 0, waits up to that many ms for the element to appear in the
@@ -565,7 +699,9 @@ def _check_selector_present(page: Page, config: SuccessIndicatorConfig, *, timeo
         return False
 
 
-def _check_url_match(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0) -> bool:
+def _check_url_match(
+    page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0
+) -> bool:
     """True if config.value (or compiled regex) matches the current page URL.
 
     When timeout_ms > 0, uses wait_for_url so SPA hash-routing changes are caught
@@ -576,7 +712,9 @@ def _check_url_match(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: 
             if config.compiled_pattern is not None:
                 page.wait_for_url(config.compiled_pattern, timeout=timeout_ms)
             else:
-                page.wait_for_url(re.compile(re.escape(config.value)), timeout=timeout_ms)
+                page.wait_for_url(
+                    re.compile(re.escape(config.value)), timeout=timeout_ms
+                )
             return True
         except Exception:
             pass
@@ -584,15 +722,21 @@ def _check_url_match(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: 
     if config.compiled_pattern is not None:
         matched = bool(config.compiled_pattern.search(url))
         if not matched:
-            _log_info(f"[deterministic] url_match: pattern {config.value!r} did not match URL {url!r}")
+            _log_info(
+                f"[deterministic] url_match: pattern {config.value!r} did not match URL {url!r}"
+            )
         return matched
     matched = config.value in url
     if not matched:
-        _log_info(f"[deterministic] url_match: {config.value!r} not found in URL {url!r}")
+        _log_info(
+            f"[deterministic] url_match: {config.value!r} not found in URL {url!r}"
+        )
     return matched
 
 
-def check_deterministic_success(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0) -> bool:
+def check_deterministic_success(
+    page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0
+) -> bool:
     """Dispatch to the correct deterministic Playwright check.
 
     Returns True when the success condition is met.
@@ -7385,10 +7529,14 @@ def run_cli_with_args(args: Any) -> None:
                             verify_why = str(e)
                             verify_confidence = None
                             verify_png = None
-                            _log_info(f"[LLM] Success criteria check failed: {verify_why}")
+                            _log_info(
+                                f"[LLM] Success criteria check failed: {verify_why}"
+                            )
                         if verify_ok:
                             try:
-                                maybe_save_final_shot(page, "PASS", png_bytes=verify_png)
+                                maybe_save_final_shot(
+                                    page, "PASS", png_bytes=verify_png
+                                )
                             except Exception as e:
                                 if args.verbose:
                                     _log_info(

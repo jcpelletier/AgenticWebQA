@@ -102,7 +102,13 @@ def build_run_lifecycle(
         provider = infer_model_provider(selected_model)
         openai_key = (app.openai_key_var.get() or "").strip()
         anthropic_key = (app.anthropic_key_var.get() or "").strip()
-        required_key = anthropic_key if provider == "anthropic" else openai_key
+        gemini_key = (app.gemini_key_var.get() or "").strip()
+        if provider == "anthropic":
+            required_key = anthropic_key
+        elif provider == "gemini":
+            required_key = gemini_key
+        else:
+            required_key = openai_key
         if not required_key:
             messagebox.showerror(
                 "Missing API key",
@@ -136,6 +142,8 @@ def build_run_lifecycle(
             env["OPENAI_API_KEY"] = openai_key
         if anthropic_key:
             env["ANTHROPIC_API_KEY"] = anthropic_key
+        if gemini_key:
+            env["GEMINI_API_KEY"] = gemini_key
         username = str(values.get("-USERNAME-") or "").strip()
         password = str(values.get("-PASSWORD-") or "")
         if username:

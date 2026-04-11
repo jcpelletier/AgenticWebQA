@@ -17,17 +17,21 @@ def build_credentials_tab(
     add_field_help: Callable[[tk.Widget, str, int], None],
     add_labeled_entry: Callable[[tk.Widget, str, tk.Variable, int, str], None],
     add_labeled_password: Callable[[tk.Widget, str, tk.Variable, int, str], None],
-) -> Tuple[tk.StringVar, tk.StringVar, Callable[[], None]]:
+) -> Tuple[tk.StringVar, tk.StringVar, tk.StringVar, Callable[[], None]]:
     openai_key_var = tk.StringVar(
         value=(os.environ.get("OPENAI_API_KEY") or "").strip()
     )
     anthropic_key_var = tk.StringVar(
         value=(os.environ.get("ANTHROPIC_API_KEY") or "").strip()
     )
+    gemini_key_var = tk.StringVar(
+        value=(os.environ.get("GEMINI_API_KEY") or "").strip()
+    )
 
     def _set_api_status() -> None:
         openai_current = (openai_key_var.get() or "").strip()
         anthropic_current = (anthropic_key_var.get() or "").strip()
+        gemini_current = (gemini_key_var.get() or "").strip()
         openai_status_label.configure(
             text=("OK" if openai_current else "MISSING"),
             foreground=("green" if openai_current else "red"),
@@ -35,6 +39,10 @@ def build_credentials_tab(
         anthropic_status_label.configure(
             text=("OK" if anthropic_current else "MISSING"),
             foreground=("green" if anthropic_current else "red"),
+        )
+        gemini_status_label.configure(
+            text=("OK" if gemini_current else "MISSING"),
+            foreground=("green" if gemini_current else "red"),
         )
 
     def _apply_api_key() -> None:
@@ -48,6 +56,11 @@ def build_credentials_tab(
             os.environ["ANTHROPIC_API_KEY"] = anthropic_raw
         else:
             os.environ.pop("ANTHROPIC_API_KEY", None)
+        gemini_raw = (gemini_key_var.get() or "").strip()
+        if gemini_raw:
+            os.environ["GEMINI_API_KEY"] = gemini_raw
+        else:
+            os.environ.pop("GEMINI_API_KEY", None)
         _set_api_status()
 
     creds_api_card = ttk.Frame(
@@ -62,7 +75,7 @@ def build_credentials_tab(
     )
     add_field_help(
         creds_api_card,
-        "API key fields map to environment variables: OPENAI_API_KEY and ANTHROPIC_API_KEY",
+        "API key fields map to environment variables: OPENAI_API_KEY, ANTHROPIC_API_KEY, and GEMINI_API_KEY",
         0,
     )
     creds_key_row = ttk.Frame(creds_api_card)
@@ -89,6 +102,18 @@ def build_credentials_tab(
     anthropic_status_label.pack(side="left", padx=(8, 0))
     anthropic_key_row.pack(anchor="w", pady=2, fill="x")
 
+    gemini_key_row = ttk.Frame(creds_api_card)
+    ttk.Label(gemini_key_row, text="Gemini API Key", width=18, anchor="w").pack(
+        side="left", padx=(0, 8)
+    )
+    gemini_entry = ttk.Entry(
+        gemini_key_row, width=30, show="*", textvariable=gemini_key_var
+    )
+    gemini_entry.pack(side="left")
+    gemini_status_label = ttk.Label(gemini_key_row, text="")
+    gemini_status_label.pack(side="left", padx=(8, 0))
+    gemini_key_row.pack(anchor="w", pady=2, fill="x")
+
     ttk.Button(creds_api_card, text="Apply", command=_apply_api_key).pack(
         anchor="w", pady=(6, 0)
     )
@@ -103,6 +128,9 @@ def build_credentials_tab(
     anthropic_entry.bind("<KeyRelease>", _api_key_changed)
     anthropic_entry.bind("<<Paste>>", _api_key_changed)
     anthropic_entry.bind("<FocusOut>", _api_key_changed)
+    gemini_entry.bind("<KeyRelease>", _api_key_changed)
+    gemini_entry.bind("<<Paste>>", _api_key_changed)
+    gemini_entry.bind("<FocusOut>", _api_key_changed)
 
     vars_map["-USERNAME-"].set((os.environ.get("AGENTICWEBQA_USERNAME") or "").strip())
     vars_map["-PASSWORD-"].set(os.environ.get("AGENTICWEBQA_PASSWORD") or "")
@@ -167,7 +195,7 @@ def build_credentials_tab(
         password_entry.bind("<<Paste>>", _creds_changed)
         password_entry.bind("<FocusOut>", _creds_changed)
 
-    return openai_key_var, anthropic_key_var, _apply_api_key
+    return openai_key_var, anthropic_key_var, gemini_key_var, _apply_api_key
 
 
 def build_run_log_panel(

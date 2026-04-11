@@ -4,7 +4,10 @@
 
 This project is a proof-of-concept browser automation agent that combines:
 - DOM-first interactions (Playwright locators) when targets can be identified, and
-- Vision-based fallback using OpenAI vision models when DOM hints are missing or fail.
+- Vision-based fallback using a vision-capable LLM when DOM hints are missing or fail.
+
+Supported model providers: **OpenAI** (`gpt-*`), **Anthropic** (`claude-*`), and **Google Gemini** (`gemini-*`).
+The provider is inferred automatically from the model name; supply the matching API key.
 
 The main script is `vision_playwright_openai_vision_poc.py`.
 The optional GUI launcher is `vision_playwright_openai_vision_ui.py`.
@@ -24,6 +27,7 @@ The optional GUI launcher is `vision_playwright_openai_vision_ui.py`.
 - `docs/features/tdd_ProfilePage.md`: TDD and implementation plan for Profile Page.
 - `docs/features/tdd_ProfileLocationDropdown.md`: TDD and implementation plan for Profile Country/State dropdown behavior.
 - `docs/features/tdd_HomeQuiz.md`: TDD and implementation plan for Home quiz card behavior.
+- `docs/features/tdd_GeminiProviderSupport.md`: TDD and implementation plan for Gemini provider support.
 
 ## Adding A New Feature
 
@@ -76,7 +80,7 @@ The intended workflow is two-phase:
 1. LLM training runs (headed, best model).
    - Run prompts in primarily LLM mode to explore the site and learn reliable DOM hints.
    - This builds the site actions library automatically (`site_hints.json` and `Models/*.json`).
-   - Use the best available model here. Recommendation: `gpt-5.1`.
+   - Use the best available model here. Recommendation: `claude-sonnet-4-6`.
 2. Test execution runs (Playwright-first).
    - Re-run prompts and tests with the learned library in place.
    - Playwright handles stable steps, while the LLM can adapt to small UI changes without failing the current run.
@@ -354,18 +358,20 @@ How to diagnose which path ran:
 
 ## UI Model Selection (Dropdown)
 
-In the UI (`vision_playwright_openai_vision_ui.py`), the Model dropdown currently includes:
-- `gpt-5`
-- `gpt-5.1`
-- `gpt-5.2`
-- `gpt-5-mini`
-- `gpt-5-nano`
+In the UI (`vision_playwright_openai_vision_ui.py`), the Model dropdown includes models from all three supported providers:
+
+**OpenAI** — `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.4-nano`, `gpt-5.2`, `gpt-5.1`, `gpt-5`, `gpt-5-mini`, `gpt-5-nano`
+
+**Anthropic** — `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-haiku-4-5`, `claude-sonnet-4-5`, `claude-opus-4-5`, `claude-opus-4-1`, `claude-sonnet-4-0`
+
+**Google Gemini** — `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`
 
 Recommendation:
-- Use `gpt-5.1` for LLM training runs and difficult sites.
-- Use the smaller models for cheaper exploratory runs when needed.
+- Use `claude-sonnet-4-6` for LLM training runs and difficult sites.
+- Use `gemini-2.5-flash` for fast, cost-effective runs when a Gemini API key is available.
+- Use smaller models for cheaper exploratory runs when needed.
 
-The dropdown value maps directly to the CLI `--model` flag.
+The dropdown value maps directly to the CLI `--model` flag; the provider is inferred from the model name prefix.
 
 ## Manual Click Interjection (Headed Mode)
 
@@ -394,7 +400,7 @@ Optional:
 - `ANTHROPIC_API_KEY`: Anthropic API key (environment variable).
 - `WEBQA_USERNAME`: Username for login tasks — maps to `{username}` in prompts (environment variable).
 - `WEBQA_PASSWORD`: Password for login tasks — maps to `{password}` in prompts (environment variable).
-- `--model`: OpenAI model name.
+- `--model`: Model name. Provider is inferred from prefix: `gpt-*` → OpenAI, `claude-*` → Anthropic, `gemini-*` → Gemini.
 - `--width`: Browser viewport width (actual).
 - `--height`: Browser viewport height (actual).
 - `--model-width`: Model screenshot width (0 uses `--width`).
@@ -427,14 +433,20 @@ Optional:
 
 You can set credentials as environment variables so secrets never appear in plain text on the command line:
 
-- `ANTHROPIC_API_KEY`: Anthropic API key used for model calls.
+- `OPENAI_API_KEY`: OpenAI API key (required when using `gpt-*` models).
+- `ANTHROPIC_API_KEY`: Anthropic API key (required when using `claude-*` models).
+- `GEMINI_API_KEY`: Google Gemini API key (required when using `gemini-*` models).
 - `WEBQA_USERNAME`: Username used for login flows (maps to `{username}` in prompts).
 - `WEBQA_PASSWORD`: Password used for login flows (maps to `{password}` in prompts).
+
+The UI credential tab also accepts keys directly and injects them into the subprocess environment.
 
 Set them permanently in PowerShell:
 
 ```powershell
-[System.Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "sk-your-key", "User")
+[System.Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "sk-your-key", "User")
+[System.Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "sk-ant-your-key", "User")
+[System.Environment]::SetEnvironmentVariable("GEMINI_API_KEY", "your-gemini-key", "User")
 [System.Environment]::SetEnvironmentVariable("WEBQA_USERNAME", "demo.user@example.com", "User")
 [System.Environment]::SetEnvironmentVariable("WEBQA_PASSWORD", "P@ssw0rd123!", "User")
 ```
@@ -442,7 +454,9 @@ Set them permanently in PowerShell:
 Or for the current session only:
 
 ```powershell
-$env:ANTHROPIC_API_KEY="sk-your-api-key-here"
+$env:OPENAI_API_KEY="sk-..."
+$env:ANTHROPIC_API_KEY="sk-ant-..."
+$env:GEMINI_API_KEY="your-gemini-key"
 $env:WEBQA_USERNAME="demo.user@example.com"
 $env:WEBQA_PASSWORD="P@ssw0rd123!"
 ```
@@ -452,7 +466,7 @@ Set username and password environment variables if needed so you don't need to e
 Set the API key and run the script.
 
 ```powershell
-$env:ANTHROPIC_API_KEY="sk-ant-..."
+$env:OPENAI_API_KEY="sk-..."
 python .\vision_playwright_openai_vision_poc.py `
   --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
   --visual-llm-success "You are on the Home page and see 'Welcome, demo'." `
@@ -542,6 +556,14 @@ $env:OPENAI_API_KEY="sk-..."; python ./webtests/run_testhomequiz_local.py --skip
 ```
 
 Home quiz smoke auto-skips when quiz controls are not yet present in `test-site`. To require the feature and fail if missing, pass `--require-feature`.
+
+One-command Gemini provider smoke sequence (login flow using Gemini):
+
+```powershell
+$env:GEMINI_API_KEY="your-key"; python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash
+```
+
+Skips gracefully with `SKIP: GEMINI_API_KEY_NOT_SET` when the key is absent.
 
 Artifacts from local smoke runs are written under repo-root paths (`Models`, `agent_view`, `reuse_run.log`, `auto_heal_run.log`, `register_run.log`, `profilepage_run.log`, `profilelocation_run.log`, `homequiz_run.log`, and `site_hints.json`).
 

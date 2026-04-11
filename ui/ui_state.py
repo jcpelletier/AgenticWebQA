@@ -24,6 +24,7 @@ class AppState:
     continue_button: "ttk.Button"
     openai_key_var: tk.StringVar
     anthropic_key_var: tk.StringVar
+    gemini_key_var: tk.StringVar
     process: subprocess.Popen | None = None
     running_state: bool = False
     running_prompt_tab_id: str | None = None
