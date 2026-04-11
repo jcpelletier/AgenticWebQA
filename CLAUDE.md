@@ -8,7 +8,9 @@ The GUI (vision_playwright_openai_vision_ui.py) persists all test tab configs to
 vision_playwright_openai_vision_ui.required.tmp
 ```
 
-This file is the source of truth for prompts, success criteria, models, and actions for each named test. When syncing release_test.py or the webtests/ scripts, compare against this file.
+This file is the source of truth for prompts, success criteria, success type, models, and actions for each named test. When syncing release_test.py or the webtests/ scripts, compare against this file.
+
+Each tab entry includes a `success_type` field (`"Visual (LLM)"`, `"Text Present"`, `"Selector Present"`, or `"URL Match"`). Tabs saved before this field was added default to `"Visual (LLM)"` on load.
 
 ### Current test tabs (as of last sync)
 

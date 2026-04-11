@@ -102,7 +102,7 @@ def run_register_integration(
         str(script),
         "--prompt",
         register_flow_prompt(username, password),
-        "--success-criteria",
+        "--visual-llm-success",
         register_flow_success(username),
         "--start-url",
         START_URL,

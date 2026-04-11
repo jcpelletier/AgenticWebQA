@@ -281,7 +281,7 @@ def run_agent_case(
         str(script),
         "--prompt",
         prompt,
-        "--success-criteria",
+        "--visual-llm-success",
         success,
         "--start-url",
         start_url,

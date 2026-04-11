@@ -130,7 +130,7 @@ def main() -> int:
             str(script),
             "--prompt",
             PROMPT,
-            "--success-criteria",
+            "--visual-llm-success",
             SUCCESS,
             "--start-url",
             START_URL,

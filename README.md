@@ -380,8 +380,14 @@ This is especially useful during LLM training runs when a control is hidden, cov
 
 Required:
 - `--prompt`: Task instruction for the agent.
-- `--success-criteria`: Text describing what must be visible for `FINAL: PASS`.
 - `--start-url`: Page to open before the agent starts.
+- Exactly one success indicator (mutually exclusive):
+  - `--visual-llm-success`: Success criteria evaluated by the LLM via screenshot.
+  - `--text-present-success`: Pass when this text appears in visible page text. Prefix with `regex:` for regex matching.
+  - `--selector-present-success`: Pass when this CSS selector matches at least one element.
+  - `--url-match-success`: Pass when the current URL contains this string. Prefix with `regex:` for regex matching.
+
+> **Removed:** `--success-criteria` was replaced by `--visual-llm-success`. Passing `--success-criteria` now exits with a deprecation error.
 
 Optional:
 - `--actions`: Comma-separated list of action functions to allow (recommended allowlist).
@@ -446,10 +452,10 @@ Set username and password environment variables if needed so you don't need to e
 Set the API key and run the script.
 
 ```powershell
-$env:OPENAI_API_KEY="sk-..."
+$env:ANTHROPIC_API_KEY="sk-ant-..."
 python .\vision_playwright_openai_vision_poc.py `
   --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
-  --success-criteria "You are on the Home page and see 'Welcome, demo'." `
+  --visual-llm-success "You are on the Home page and see 'Welcome, demo'." `
   --start-url "http://127.0.0.1:8000/index.html" `
   --actions "login_flow" `
   --max-tokens 192 --max-steps 20 --keep-last-turns 3 --keep-last-images 0 `

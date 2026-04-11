@@ -41,13 +41,15 @@ def build_run_lifecycle(
     vars_map: Dict[str, tk.Variable],
     apply_api_key: Callable[[], None],
     get_active_prompt_fields: Callable[
-        [], Tuple[tk.Text, tk.Text, tk.StringVar, tk.StringVar, tk.StringVar]
+        [],
+        Tuple[tk.Text, tk.Text, tk.StringVar, tk.StringVar, tk.StringVar, tk.StringVar],
     ],
     collect_values: Callable[
         [
             Dict[str, tk.Variable],
             tk.Text,
             tk.Text,
+            tk.StringVar,
             tk.StringVar,
             tk.StringVar,
             tk.StringVar,
@@ -78,13 +80,19 @@ def build_run_lifecycle(
         if not target_script.exists():
             messagebox.showerror("Missing script", f"Script not found: {target_script}")
             return
-        prompt_widget, success_widget, start_url_var, model_var, actions_var = (
-            get_active_prompt_fields()
-        )
+        (
+            prompt_widget,
+            success_widget,
+            success_type_var,
+            start_url_var,
+            model_var,
+            actions_var,
+        ) = get_active_prompt_fields()
         values = collect_values(
             vars_map,
             prompt_widget,
             success_widget,
+            success_type_var,
             start_url_var,
             model_var,
             actions_var,

@@ -19,6 +19,8 @@ This document outlines the major classes, functions, and control flow in `vision
 - `_TemplateVars`: `dict` subclass for safe string formatting with default values.
 - `ArmedClick`: Tracks â€œarm/commitâ€ click gating state (confirmable clicks).
 - `_TeeStream`: Mirrors stdout/stderr to a log file.
+- `SuccessIndicatorType` (in `config_shared.py`): Enum of the four success check strategies — `VISUAL_LLM`, `TEXT_PRESENT`, `SELECTOR_PRESENT`, `URL_MATCH`.
+- `SuccessIndicatorConfig` (in `config_shared.py`): Dataclass holding `type: SuccessIndicatorType`, `value: str`, and `compiled_pattern` (pre-compiled regex when `value` starts with `"regex:"`). Compiled once at construction in `__post_init__`.
 
 **Logging + Telemetry**
 - `_init_logger()`, `_refresh_logger_stream()`: Configure stdout logging.
@@ -136,7 +138,8 @@ This document outlines the major classes, functions, and control flow in `vision
 - `pick_function_sequence()`: Decide which functions to run for a prompt.
 - `select_actions_to_rewrite_with_llm()`: Identify actions to repair via LLM.
 - `resummarize_steps_with_llm()`: Prune redundant executed steps before saving new actions.
-- `verify_success_with_llm()`: Screenshot-based success criteria check.
+- `verify_success_with_llm()`: Screenshot-based success criteria check (used only for `VISUAL_LLM` indicator type).
+- `check_deterministic_success(page, config: SuccessIndicatorConfig) -> bool`: Dispatches to one of three Playwright-based checks without any LLM call — text presence (`page.inner_text("body")`), selector existence (`page.locator().count() > 0`), or URL match (`page.url`). Supports `regex:` prefix for pattern matching in text and URL checks. Called after each action step when indicator type is not `VISUAL_LLM`.
 
 **Learning + Model Update**
 - `update_or_add_function()`: Insert/replace model function.

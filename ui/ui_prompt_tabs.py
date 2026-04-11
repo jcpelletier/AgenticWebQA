@@ -11,6 +11,35 @@ from config_shared import DEFAULT_MODEL, MODEL_OPTIONS
 from .ui_state import PromptTabsState
 
 LABEL_WIDTH = 18
+SUCCESS_TYPE_OPTIONS = ["Visual (LLM)", "Text Present", "Selector Present", "URL Match"]
+SUCCESS_TYPE_DEFAULT = "Visual (LLM)"
+SUCCESS_LABEL_TO_ARG = {
+    "Visual (LLM)": "--visual-llm-success",
+    "Text Present": "--text-present-success",
+    "Selector Present": "--selector-present-success",
+    "URL Match": "--url-match-success",
+}
+SUCCESS_TYPE_HINTS = {
+    "Visual (LLM)": (
+        "Free-form description of what must be visible on screen. "
+        "The LLM evaluates a screenshot against this text. "
+        "e.g. \"The user is on the Home page and sees 'Welcome, demo'.\""
+    ),
+    "Text Present": (
+        "Exact text that must appear in the visible page body (case-sensitive). "
+        "Prefix with regex: for a regular expression. "
+        'e.g. "Welcome, demo"  or  "regex:Welcome, \\w+"'
+    ),
+    "Selector Present": (
+        "CSS selector that must match at least one element in the DOM. "
+        "e.g. [data-testid='home-welcome']  or  .success-banner  or  h1"
+    ),
+    "URL Match": (
+        "Text the current page URL must contain (substring match). "
+        "Prefix with regex: for a regular expression. "
+        'e.g. "home.html"  or  "regex:.*/home\\.html$"'
+    ),
+}
 RUNNING_TAB_SUFFIX = ""
 RUNNING_TAB_LEGACY_SUFFIX = " (RUNNING)"
 RUNNING_TAB_PREFIX = "â— "
@@ -216,10 +245,46 @@ def create_prompt_tab(
     )
     success_card.pack(fill="x", pady=(0, 8))
     _add_section_title(success_card, "Success Criteria")
+    type_row = ttk.Frame(success_card)
+    ttk.Label(
+        type_row,
+        text="Success Type",
+        width=LABEL_WIDTH,
+        anchor="e",
+        style="FieldLabel.TLabel",
+    ).pack(side="left", padx=(0, 8))
+    success_type_var = tk.StringVar(value=SUCCESS_TYPE_DEFAULT)
+    success_type_combo = ttk.Combobox(
+        type_row,
+        textvariable=success_type_var,
+        values=SUCCESS_TYPE_OPTIONS,
+        width=22,
+        state="readonly",
+    )
+    success_type_combo.pack(side="left")
+    type_row.pack(anchor="w", pady=(0, 4), fill="x")
     success_text = tk.Text(
         success_card, height=3, width=90, font=("Segoe UI", text_font_size)
     )
     success_text.pack(fill="x", pady=(0, 2))
+
+    success_hint_var = tk.StringVar(
+        value=SUCCESS_TYPE_HINTS.get(SUCCESS_TYPE_DEFAULT, "")
+    )
+    hint_row = ttk.Frame(success_card, style="FieldHelpRow.TFrame", padding=(0, 0))
+    hint_row.pack(fill="x", pady=(0, 2))
+    ttk.Label(
+        hint_row,
+        textvariable=success_hint_var,
+        style="FieldHelp.TLabel",
+        wraplength=900,
+        justify="left",
+    ).pack(anchor="w", padx=(8, 8), pady=(4, 4))
+
+    def _on_success_type_changed(_event: object = None) -> None:
+        success_hint_var.set(SUCCESS_TYPE_HINTS.get(success_type_var.get(), ""))
+
+    success_type_combo.bind("<<ComboboxSelected>>", _on_success_type_changed)
 
     run_card = ttk.Frame(
         content_frame, style="Card.TFrame", bootstyle="secondary", padding=12
@@ -271,6 +336,7 @@ def create_prompt_tab(
     # Attributes on placeholder for backward-compatible access via nametowidget.
     setattr(placeholder, "_prompt_text", prompt_text)
     setattr(placeholder, "_success_text", success_text)
+    setattr(placeholder, "_success_type_var", success_type_var)
     setattr(placeholder, "_start_url_var", start_url_var)
     setattr(placeholder, "_model_var", model_var)
     setattr(placeholder, "_actions_var", actions_var)
@@ -294,15 +360,23 @@ def add_prompt_tab_to_state(
 
 def get_active_prompt_fields_from_state(
     state: PromptTabsState,
-) -> Tuple[tk.Text, tk.Text, tk.StringVar, tk.StringVar, tk.StringVar]:
+) -> Tuple[tk.Text, tk.Text, tk.StringVar, tk.StringVar, tk.StringVar, tk.StringVar]:
     current = state.prompt_tabs.select()
     tab = state.prompt_tabs.nametowidget(current)
     prompt_widget = getattr(tab, "_prompt_text")
     success_widget = getattr(tab, "_success_text")
+    success_type_var = getattr(tab, "_success_type_var")
     start_url_var = getattr(tab, "_start_url_var")
     model_var = getattr(tab, "_model_var")
     actions_var = getattr(tab, "_actions_var")
-    return prompt_widget, success_widget, start_url_var, model_var, actions_var
+    return (
+        prompt_widget,
+        success_widget,
+        success_type_var,
+        start_url_var,
+        model_var,
+        actions_var,
+    )
 
 
 def get_prompt_state_snapshot(state: PromptTabsState) -> Dict[str, object]:
@@ -315,6 +389,7 @@ def get_prompt_state_snapshot(state: PromptTabsState) -> Dict[str, object]:
         title = str(state.prompt_tabs.tab(tab_id, "text"))
         prompt_widget = getattr(tab, "_prompt_text")
         success_widget = getattr(tab, "_success_text")
+        success_type_var = getattr(tab, "_success_type_var")
         start_url_var = getattr(tab, "_start_url_var")
         model_var = getattr(tab, "_model_var")
         actions_var = getattr(tab, "_actions_var")
@@ -323,6 +398,9 @@ def get_prompt_state_snapshot(state: PromptTabsState) -> Dict[str, object]:
                 "title": title,
                 "prompt": prompt_widget.get("1.0", "end").strip(),
                 "success_criteria": success_widget.get("1.0", "end").strip(),
+                "success_type": (
+                    success_type_var.get() or SUCCESS_TYPE_DEFAULT
+                ).strip(),
                 "start_url": (start_url_var.get() or "").strip(),
                 "model": (model_var.get() or "").strip(),
                 "actions": (actions_var.get() or "").strip(),

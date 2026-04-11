@@ -199,7 +199,7 @@ def run_profile_integration(
         str(script),
         "--prompt",
         profile_flow_prompt(rand_str),
-        "--success-criteria",
+        "--visual-llm-success",
         profile_flow_success(rand_str),
         "--start-url",
         START_URL,

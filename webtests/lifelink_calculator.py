@@ -289,7 +289,7 @@ def run_test(
         str(script),
         "--prompt",
         prompt,
-        "--success-criteria",
+        "--visual-llm-success",
         success,
         "--start-url",
         CALC_URL,
