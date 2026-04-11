@@ -110,7 +110,7 @@ def test_run_cli_with_args_smoke(monkeypatch, tmp_path) -> None:
         [
             "--prompt",
             "Open example.com",
-            "--success-criteria",
+            "--visual-llm-success",
             "Example",
             "--start-url",
             "example.com",
@@ -123,4 +123,7 @@ def test_run_cli_with_args_smoke(monkeypatch, tmp_path) -> None:
     assert called.count == 1
     assert called.kwargs is not None
     assert called.kwargs.get("task_prompt") == "Open example.com"
-    assert called.kwargs.get("success_criteria") == "Example"
+    indicator = called.kwargs.get("success_indicator")
+    assert indicator is not None
+    assert indicator.type == poc.SuccessIndicatorType.VISUAL_LLM
+    assert indicator.value == "Example"

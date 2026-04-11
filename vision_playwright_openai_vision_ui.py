@@ -45,6 +45,8 @@ from ui.ui_ai_view import (
     refresh_ai_view,
 )
 from ui.ui_prompt_tabs import (
+    SUCCESS_LABEL_TO_ARG,
+    SUCCESS_TYPE_DEFAULT,
     build_prompt_tabs_panel,
     clean_running_suffixes,
     create_prompt_tab,
@@ -218,6 +220,10 @@ def _build_command(
     prompt = (values.get("-PROMPT-") or "").strip()
     success = (values.get("-SUCCESS-") or "").strip()
     start_url = (values.get("-STARTURL-") or "").strip()
+    success_type_label = str(
+        values.get("-SUCCESS-TYPE-") or SUCCESS_TYPE_DEFAULT
+    ).strip()
+    success_flag = SUCCESS_LABEL_TO_ARG.get(success_type_label, "--visual-llm-success")
     if not prompt or not success or not start_url:
         raise ValueError("Prompt, success criteria, and start URL are required.")
 
@@ -227,7 +233,7 @@ def _build_command(
         str(_script_path()),
         "--prompt",
         prompt,
-        "--success-criteria",
+        success_flag,
         success,
         "--start-url",
         start_url,
@@ -278,6 +284,7 @@ def _collect_values(
     vars_map: Dict[str, tk.Variable],
     prompt_text: tk.Text,
     success_text: tk.Text,
+    success_type_var: tk.StringVar,
     start_url_var: tk.StringVar,
     model_var: tk.StringVar,
     actions_var: tk.StringVar,
@@ -290,6 +297,7 @@ def _collect_values(
             values[key] = str(var.get())
     values["-PROMPT-"] = prompt_text.get("1.0", "end").strip()
     values["-SUCCESS-"] = success_text.get("1.0", "end").strip()
+    values["-SUCCESS-TYPE-"] = (success_type_var.get() or SUCCESS_TYPE_DEFAULT).strip()
     values["-STARTURL-"] = (start_url_var.get() or "").strip()
     values["-MODEL-"] = (model_var.get() or "").strip()
     values["-ACTIONS-"] = (actions_var.get() or "").strip()
@@ -450,19 +458,25 @@ def main() -> None:
     plus_tab = prompt_state.plus_tab
 
     def _get_active_prompt_fields() -> Tuple[
-        tk.Text, tk.Text, tk.StringVar, tk.StringVar, tk.StringVar
+        tk.Text, tk.Text, tk.StringVar, tk.StringVar, tk.StringVar, tk.StringVar
     ]:
         return get_active_prompt_fields_from_state(prompt_state)
 
     def _save_ui_state_snapshot() -> None:
         try:
-            prompt_widget, success_widget, start_url_var, model_var, actions_var = (
-                _get_active_prompt_fields()
-            )
+            (
+                prompt_widget,
+                success_widget,
+                success_type_var,
+                start_url_var,
+                model_var,
+                actions_var,
+            ) = _get_active_prompt_fields()
             values = _collect_values(
                 vars_map,
                 prompt_widget,
                 success_widget,
+                success_type_var,
                 start_url_var,
                 model_var,
                 actions_var,
@@ -473,6 +487,7 @@ def main() -> None:
         state: Dict[str, object] = {
             "prompt": values.get("-PROMPT-", ""),
             "success_criteria": values.get("-SUCCESS-", ""),
+            "success_type": values.get("-SUCCESS-TYPE-", SUCCESS_TYPE_DEFAULT),
             "start_url": values.get("-STARTURL-", ""),
             "model": values.get("-MODEL-", DEFAULT_MODEL),
             "actions": values.get("-ACTIONS-", ""),

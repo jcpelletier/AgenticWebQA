@@ -61,6 +61,8 @@ from config_shared import (
     DEFAULT_MODEL,
     DEFAULT_X_SIZE_PX,
     DEFAULT_X_THICKNESS_PX,
+    SuccessIndicatorConfig,
+    SuccessIndicatorType,
     infer_model_provider,
     model_api_env_var,
 )
@@ -520,6 +522,48 @@ class RunOutcome:
     verdict: Optional[str]
     actions: List[Dict[str, Any]]
     error: Optional[str] = None
+
+
+def _check_text_present(page: Page, config: SuccessIndicatorConfig) -> bool:
+    """True if config.value (or compiled regex) found in page visible text."""
+    try:
+        body_text = page.inner_text("body", timeout=5000)
+    except Exception:
+        return False
+    if config.compiled_pattern is not None:
+        return bool(config.compiled_pattern.search(body_text))
+    return config.value in body_text
+
+
+def _check_selector_present(page: Page, config: SuccessIndicatorConfig) -> bool:
+    """True if the CSS selector in config.value matches at least one element."""
+    try:
+        return page.locator(config.value).count() > 0
+    except Exception:
+        return False
+
+
+def _check_url_match(page: Page, config: SuccessIndicatorConfig) -> bool:
+    """True if config.value (or compiled regex) matches the current page URL."""
+    url = page.url
+    if config.compiled_pattern is not None:
+        return bool(config.compiled_pattern.search(url))
+    return config.value in url
+
+
+def check_deterministic_success(page: Page, config: SuccessIndicatorConfig) -> bool:
+    """Dispatch to the correct deterministic Playwright check.
+
+    Returns True when the success condition is met.
+    Always returns False for VISUAL_LLM (handled by LLM verify guard instead).
+    """
+    if config.type == SuccessIndicatorType.TEXT_PRESENT:
+        return _check_text_present(page, config)
+    if config.type == SuccessIndicatorType.SELECTOR_PRESENT:
+        return _check_selector_present(page, config)
+    if config.type == SuccessIndicatorType.URL_MATCH:
+        return _check_url_match(page, config)
+    return False
 
 
 def ensure_dir(path: str) -> str:
@@ -4281,7 +4325,7 @@ def _run_agent_step_loop(
     failure_path: str,
     action_records: List[Dict[str, Any]],
     client: OpenAIClient,
-    success_criteria: str,
+    success_indicator: SuccessIndicatorConfig,
     verify_wait_s: float,
     wait_for_step_training: Callable[[int, str], bool],
     record_action: Callable[[str, Dict[str, Any], Optional[Dict[str, Any]]], None],
@@ -4454,40 +4498,41 @@ def _run_agent_step_loop(
                 return resp_state.outcome
             data = resp_state.data
 
-            verify_state = _handle_verify_guard(
-                data=data,
-                client=client,
-                model=model,
-                context=context,
-                page=state.page,
-                step=step,
-                step_t0=step_t0,
-                success_criteria=success_criteria,
-                viewport=viewport,
-                model_viewport=model_viewport,
-                verify_wait_s=verify_wait_s,
-                verbose=verbose,
-                enable_agent_view=enable_agent_view,
-                agent_view_dir=agent_view_dir,
-                last_mark_points_actual=state.last_mark_points_actual,
-                x_size_px=x_size_px,
-                x_thickness_px=x_thickness_px,
-                defer_final=defer_final,
-                success_path=success_path,
-                failure_path=failure_path,
-                action_records=action_records,
-                add_history=add_history,
-                last_result_text=state.last_result_text,
-                final_state=final_state,
-                task_prompt=task_prompt,
-                verify_guard_min_confidence=verify_guard_min_confidence,
-            )
-            state.page = verify_state.page
-            state.last_result_text = verify_state.last_result_text
-            if verify_state.should_continue:
-                continue
-            if verify_state.outcome is not None:
-                return verify_state.outcome
+            if success_indicator.type == SuccessIndicatorType.VISUAL_LLM:
+                verify_state = _handle_verify_guard(
+                    data=data,
+                    client=client,
+                    model=model,
+                    context=context,
+                    page=state.page,
+                    step=step,
+                    step_t0=step_t0,
+                    success_criteria=success_indicator.value,
+                    viewport=viewport,
+                    model_viewport=model_viewport,
+                    verify_wait_s=verify_wait_s,
+                    verbose=verbose,
+                    enable_agent_view=enable_agent_view,
+                    agent_view_dir=agent_view_dir,
+                    last_mark_points_actual=state.last_mark_points_actual,
+                    x_size_px=x_size_px,
+                    x_thickness_px=x_thickness_px,
+                    defer_final=defer_final,
+                    success_path=success_path,
+                    failure_path=failure_path,
+                    action_records=action_records,
+                    add_history=add_history,
+                    last_result_text=state.last_result_text,
+                    final_state=final_state,
+                    task_prompt=task_prompt,
+                    verify_guard_min_confidence=verify_guard_min_confidence,
+                )
+                state.page = verify_state.page
+                state.last_result_text = verify_state.last_result_text
+                if verify_state.should_continue:
+                    continue
+                if verify_state.outcome is not None:
+                    return verify_state.outcome
 
             action = ""
             action_args: Dict[str, Any] = {}
@@ -4631,6 +4676,27 @@ def _run_agent_step_loop(
                         verbose=verbose,
                     )
                 )
+                if (
+                    success_indicator.type != SuccessIndicatorType.VISUAL_LLM
+                    and check_deterministic_success(state.page, success_indicator)
+                ):
+                    _log_info(
+                        f"[deterministic] {success_indicator.type.value} matched: {success_indicator.value!r}"
+                    )
+                    det_png = state.page.screenshot(
+                        type="png", full_page=False, scale="css"
+                    )
+                    if not defer_final:
+                        write_final_screenshot(
+                            det_png,
+                            verdict="PASS",
+                            success_path=success_path,
+                            failure_path=failure_path,
+                        )
+                        _log_final("PASS", final_state)
+                    return RunOutcome(
+                        verdict="PASS", actions=action_records, error=None
+                    )
                 _log_timing(
                     f"llm.step_{step}.total",
                     time.perf_counter() - step_t0,
@@ -6599,7 +6665,7 @@ def run_agent(
     context: BrowserContext,
     page: Page,
     task_prompt: str,
-    success_criteria: str,
+    success_indicator: SuccessIndicatorConfig,
     model: str,
     max_steps: int,
     viewport: Viewport,
@@ -6715,7 +6781,7 @@ def run_agent(
             "In WHY, briefly summarize the top 2-3 DOM target options you considered and why you picked this one (keep concise).",
             "Also include an Impact tag in WHY: Impact=HELPED|NO_EFFECT|REGRESSED describing whether this step moved progress forward.",
             f"Task: {task_prompt}",
-            f"Success criteria: {success_criteria}",
+            f"Success criteria: {success_indicator.value}",
         ]
         if dom_candidates:
             parts.append("DOM candidates (use role/name or selector when possible):")
@@ -6930,7 +6996,7 @@ def run_agent(
         failure_path=failure_path,
         action_records=action_records,
         client=client,
-        success_criteria=success_criteria,
+        success_indicator=success_indicator,
         verify_wait_s=verify_wait_s,
         wait_for_step_training=_wait_for_step_training,
         record_action=record_action,
@@ -7080,7 +7146,14 @@ def run_cli_with_args(args: Any) -> None:
             "rand_string": "".join(random.choices(string.ascii_lowercase, k=5)),
         }
         args.prompt = _render_template(args.prompt, variables)
-        args.success_criteria = _render_template(args.success_criteria, variables)
+        rendered_indicator_value = _render_template(
+            args.success_indicator.value, variables
+        )
+        if rendered_indicator_value != args.success_indicator.value:
+            args.success_indicator = SuccessIndicatorConfig(
+                type=args.success_indicator.type,
+                value=rendered_indicator_value,
+            )
         # After rendering, extract username/password from the prompt as fallbacks
         # when they were not supplied via env vars (e.g. dynamic registration prompts).
         if not username:
@@ -7093,14 +7166,14 @@ def run_cli_with_args(args: Any) -> None:
                 variables["password"] = extracted
         query = _extract_quoted_value(args.prompt)
         variables["prompt"] = args.prompt
-        variables["success_criteria"] = args.success_criteria
+        variables["success_criteria"] = args.success_indicator.value
         variables["query"] = query or ""
 
         _log_info("[LLM] Run context:")
         _secret = variables.get("password") or None
         _log_info(f"Prompt:\n{_redact_secret_text(args.prompt, _secret)}")
         _log_info(
-            f"Success criteria:\n{_redact_secret_text(args.success_criteria, _secret)}"
+            f"Success criteria:\n{_redact_secret_text(args.success_indicator.value, _secret)}"
         )
 
         client = _new_model_client(args.model, api_key)
@@ -7203,51 +7276,104 @@ def run_cli_with_args(args: Any) -> None:
                             f"[LLM] Completed requested prefix actions: {sequence}. Continuing to build missing actions: {remaining_actions}"
                         )
                 else:
-                    try:
-                        _seq_history = "\n".join(
-                            f"{i + 1}. {name}" for i, name in enumerate(sequence)
-                        )
-                        (
-                            verify_ok,
-                            verify_verdict,
-                            verify_why,
-                            verify_confidence,
-                            verify_png,
-                        ) = verify_success_with_llm(
-                            client,
-                            args.model,
-                            page,
-                            args.success_criteria,
-                            viewport=viewport,
-                            model_viewport=model_viewport,
-                            verify_wait_s=args.verify_wait,
-                            task_prompt=args.prompt,
-                            action_history=_seq_history,
-                        )
-                    except Exception as e:
+                    if args.success_indicator.type != SuccessIndicatorType.VISUAL_LLM:
+                        if args.verify_wait and args.verify_wait > 0:
+                            time.sleep(args.verify_wait)
+                        try:
+                            page.wait_for_load_state("domcontentloaded", timeout=5000)
+                        except Exception:
+                            pass
+                        det_ok = check_deterministic_success(page, args.success_indicator)
+                        if det_ok:
+                            _log_info(
+                                f"[deterministic] {args.success_indicator.type.value} matched: {args.success_indicator.value!r}"
+                            )
+                            try:
+                                maybe_save_final_shot(page, "PASS")
+                            except Exception as e:
+                                if args.verbose:
+                                    _log_info(
+                                        f"[playwright] Failed to save success screenshot: {e}"
+                                    )
+                            if not used_prompt_route and not manual_actions:
+                                set_prompt_route(
+                                    page_model,
+                                    args.prompt,
+                                    sequence,
+                                    page_model.get("functions", []),
+                                )
+                                save_page_model(model_path, page_model)
+                            _log_final("PASS", final_state)
+                            context.close()
+                            browser.close()
+                            return
+                        if args.verbose:
+                            _log_info(
+                                f"[deterministic] {args.success_indicator.type.value} not matched: {args.success_indicator.value!r}"
+                            )
+                    else:
                         verify_ok = False
-                        verify_verdict = "ERROR"
-                        verify_why = str(e)
+                        verify_verdict = "FAIL"
+                        verify_why = ""
                         verify_confidence = None
                         verify_png = None
-                        _log_info(f"[LLM] Success criteria check failed: {verify_why}")
-                    if verify_ok:
                         try:
-                            maybe_save_final_shot(page, "PASS", png_bytes=verify_png)
-                        except Exception as e:
-                            if args.verbose:
-                                _log_info(
-                                    f"[playwright] Failed to save success screenshot: {e}"
-                                )
-                        if not used_prompt_route and not manual_actions:
-                            set_prompt_route(
-                                page_model,
-                                args.prompt,
-                                sequence,
-                                page_model.get("functions", []),
+                            _seq_history = "\n".join(
+                                f"{i + 1}. {name}" for i, name in enumerate(sequence)
                             )
-                            save_page_model(model_path, page_model)
-                        _log_final("PASS", final_state)
+                            (
+                                verify_ok,
+                                verify_verdict,
+                                verify_why,
+                                verify_confidence,
+                                verify_png,
+                            ) = verify_success_with_llm(
+                                client,
+                                args.model,
+                                page,
+                                args.success_indicator.value,
+                                viewport=viewport,
+                                model_viewport=model_viewport,
+                                verify_wait_s=args.verify_wait,
+                                task_prompt=args.prompt,
+                                action_history=_seq_history,
+                            )
+                        except Exception as e:
+                            verify_ok = False
+                            verify_verdict = "ERROR"
+                            verify_why = str(e)
+                            verify_confidence = None
+                            verify_png = None
+                            _log_info(f"[LLM] Success criteria check failed: {verify_why}")
+                        if verify_ok:
+                            try:
+                                maybe_save_final_shot(page, "PASS", png_bytes=verify_png)
+                            except Exception as e:
+                                if args.verbose:
+                                    _log_info(
+                                        f"[playwright] Failed to save success screenshot: {e}"
+                                    )
+                            if not used_prompt_route and not manual_actions:
+                                set_prompt_route(
+                                    page_model,
+                                    args.prompt,
+                                    sequence,
+                                    page_model.get("functions", []),
+                                )
+                                save_page_model(model_path, page_model)
+                            _log_final("PASS", final_state)
+                            if args.verbose:
+                                conf_note = (
+                                    f" (confidence={verify_confidence:.2f})"
+                                    if verify_confidence is not None
+                                    else ""
+                                )
+                                _log_info(
+                                    f"[LLM] Sequence completed and success criteria confirmed: {verify_why}{conf_note}"
+                                )
+                            context.close()
+                            browser.close()
+                            return
                         if args.verbose:
                             conf_note = (
                                 f" (confidence={verify_confidence:.2f})"
@@ -7255,28 +7381,16 @@ def run_cli_with_args(args: Any) -> None:
                                 else ""
                             )
                             _log_info(
-                                f"[LLM] Sequence completed and success criteria confirmed: {verify_why}{conf_note}"
+                                f"[LLM] Success criteria check: {verify_verdict} - {verify_why}{conf_note}"
                             )
-                        context.close()
-                        browser.close()
-                        return
-                    if args.verbose:
-                        conf_note = (
-                            f" (confidence={verify_confidence:.2f})"
-                            if verify_confidence is not None
-                            else ""
-                        )
-                        _log_info(
-                            f"[LLM] Success criteria check: {verify_verdict} - {verify_why}{conf_note}"
-                        )
-                    if manual_actions:
-                        manual_verify_failed = True
-                        manual_verify_why = verify_why
-                        manual_verify_confidence = verify_confidence
+                        if manual_actions:
+                            manual_verify_failed = True
+                            manual_verify_why = verify_why
+                            manual_verify_confidence = verify_confidence
 
-                    if args.verbose:
-                        _log_info(f"[playwright] Sequence failed: {err}")
-                    # If manual actions remain, continue to fallback regardless of verify result.
+                        if args.verbose:
+                            _log_info(f"[playwright] Sequence failed: {err}")
+                        # If manual actions remain, continue to fallback regardless of verify result.
             if failed_func and failed_func in sequence:
                 completed_functions = sequence[: sequence.index(failed_func)]
             else:
@@ -7472,7 +7586,7 @@ def run_cli_with_args(args: Any) -> None:
             context=context,
             page=page,
             task_prompt=args.prompt,
-            success_criteria=args.success_criteria,
+            success_indicator=args.success_indicator,
             model=args.model,
             max_steps=args.max_steps,
             viewport=viewport,
@@ -7593,7 +7707,7 @@ def run_cli_with_args(args: Any) -> None:
                     manual_actions,
                     page_model.get("functions", []),
                     args.prompt,
-                    args.success_criteria,
+                    args.success_indicator.value,
                     manual_verify_why,
                     outcome.actions,
                     verbose=args.verbose,
@@ -8421,7 +8535,7 @@ def run_cli_with_args(args: Any) -> None:
                         client,
                         args.model,
                         page,
-                        args.success_criteria,
+                        args.success_indicator.value,
                         viewport=viewport,
                         model_viewport=model_viewport,
                         verify_wait_s=args.verify_wait,

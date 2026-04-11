@@ -112,7 +112,7 @@ def run_profile_location_integration(
         str(script),
         "--prompt",
         profile_location_flow_prompt(),
-        "--success-criteria",
+        "--visual-llm-success",
         profile_location_flow_success(),
         "--start-url",
         START_URL,

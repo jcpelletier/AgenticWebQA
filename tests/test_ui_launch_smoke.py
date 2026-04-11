@@ -18,7 +18,7 @@ def test_build_command_and_launch(monkeypatch, tmp_path) -> None:
 
     assert cmd[0] == sys.executable
     assert "--prompt" in cmd
-    assert "--success-criteria" in cmd
+    assert "--visual-llm-success" in cmd
     assert "--start-url" in cmd
     assert str(step_signal) in cmd
 

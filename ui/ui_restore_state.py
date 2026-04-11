@@ -7,6 +7,7 @@ import tkinter as tk
 import tkinter.font as tkfont
 
 from config_shared import DEFAULT_MODEL
+from .ui_prompt_tabs import SUCCESS_TYPE_DEFAULT
 from .ui_state import PromptTabsState
 
 if TYPE_CHECKING:
@@ -76,7 +77,8 @@ def restore_ui_state(
     get_prompt_tabs: Callable[[PromptTabsState], list[str]],
     create_prompt_tab: CreatePromptTab,
     get_active_prompt_fields: Callable[
-        [], tuple[tk.Text, tk.Text, tk.StringVar, tk.StringVar, tk.StringVar]
+        [],
+        tuple[tk.Text, tk.Text, tk.StringVar, tk.StringVar, tk.StringVar, tk.StringVar],
     ],
     text_font_size: int,
 ) -> None:
@@ -110,11 +112,13 @@ def restore_ui_state(
             )
             prompt_widget = getattr(tab, "_prompt_text")
             success_widget = getattr(tab, "_success_text")
+            success_type_var = getattr(tab, "_success_type_var")
             start_url_var = getattr(tab, "_start_url_var")
             model_var = getattr(tab, "_model_var")
             actions_var = getattr(tab, "_actions_var")
             prompt_widget.insert("1.0", str(item.get("prompt") or ""))
             success_widget.insert("1.0", str(item.get("success_criteria") or ""))
+            success_type_var.set(str(item.get("success_type") or SUCCESS_TYPE_DEFAULT))
             start_url_var.set(str(item.get("start_url") or ""))
             model_var.set(str(item.get("model") or DEFAULT_MODEL))
             actions_var.set(str(item.get("actions") or ""))
@@ -124,13 +128,19 @@ def restore_ui_state(
             if tabs:
                 prompt_tabs.select(tabs[min(active_index, len(tabs) - 1)])
     else:
-        prompt_widget, success_widget, start_url_var, model_var, actions_var = (
-            get_active_prompt_fields()
-        )
+        (
+            prompt_widget,
+            success_widget,
+            success_type_var,
+            start_url_var,
+            model_var,
+            actions_var,
+        ) = get_active_prompt_fields()
         if cached.get("prompt"):
             prompt_widget.insert("1.0", str(cached.get("prompt") or ""))
         if cached.get("success_criteria"):
             success_widget.insert("1.0", str(cached.get("success_criteria") or ""))
+        success_type_var.set(str(cached.get("success_type") or SUCCESS_TYPE_DEFAULT))
         if cached.get("start_url"):
             start_url_var.set(str(cached.get("start_url") or ""))
         if cached.get("model"):

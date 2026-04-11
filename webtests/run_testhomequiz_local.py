@@ -112,7 +112,7 @@ def run_home_quiz_integration(repo_root: Path, *, model: str, log_path: Path) ->
         str(script),
         "--prompt",
         home_quiz_flow_prompt(),
-        "--success-criteria",
+        "--visual-llm-success",
         home_quiz_flow_success(),
         "--start-url",
         START_URL,

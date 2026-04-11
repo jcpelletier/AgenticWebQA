@@ -6,7 +6,9 @@ Shared configuration defaults used by both CLI and UI entrypoints.
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+import enum
+import re
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Optional, Sequence
 
 
@@ -52,6 +54,26 @@ DEFAULT_MAX_STEPS = 40
 DEFAULT_MAX_SUBACTIONS_PER_FUNCTION = 6
 DEFAULT_SCREENSHOT_BASE = "run.png"
 DEFAULT_AGENT_VIEW_DIR = "agent_view"
+
+
+class SuccessIndicatorType(enum.Enum):
+    VISUAL_LLM = "visual_llm"
+    TEXT_PRESENT = "text_present"
+    SELECTOR_PRESENT = "selector_present"
+    URL_MATCH = "url_match"
+
+
+@dataclass
+class SuccessIndicatorConfig:
+    type: SuccessIndicatorType
+    value: str
+    compiled_pattern: Optional[re.Pattern[str]] = field(
+        default=None, init=False, repr=False
+    )
+
+    def __post_init__(self) -> None:
+        if self.value.startswith("regex:"):
+            self.compiled_pattern = re.compile(self.value[len("regex:") :])
 
 
 @dataclass(frozen=True)
