@@ -110,7 +110,7 @@ jobs:
         run: |
           python -u .\vision_playwright_openai_vision_poc.py `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
-            --success-criteria "You are on the Home page and see 'Welcome, demo'." `
+            --visual-llm-success "You are on the Home page and see 'Welcome, demo'." `
             --start-url "http://127.0.0.1:8000/index.html" `
             --actions "login_flow" `
             --max-steps 20 `
@@ -152,7 +152,7 @@ jobs:
         run: |
           python -u .\vision_playwright_openai_vision_poc.py `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
-            --success-criteria "You are on the Home page and see 'Welcome, demo'." `
+            --visual-llm-success "You are on the Home page and see 'Welcome, demo'." `
             --start-url "http://127.0.0.1:8000/index.html" `
             --actions "login_flow" `
             --max-steps 20 `
@@ -174,7 +174,7 @@ jobs:
         run: |
           python -u .\vision_playwright_openai_vision_poc.py `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
-            --success-criteria "You are on the Home page and see 'Welcome, demo'." `
+            --visual-llm-success "You are on the Home page and see 'Welcome, demo'." `
             --start-url "http://127.0.0.1:8000/index.html" `
             --actions "login_flow" `
             --max-steps 20 `
