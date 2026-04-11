@@ -282,7 +282,6 @@ def create_prompt_tab(
     ).pack(anchor="w", padx=(8, 8), pady=(4, 4))
 
     def _on_success_type_changed(_event: object = None) -> None:
-        success_text.delete("1.0", "end")
         success_hint_var.set(SUCCESS_TYPE_HINTS.get(success_type_var.get(), ""))
 
     success_type_combo.bind("<<ComboboxSelected>>", _on_success_type_changed)

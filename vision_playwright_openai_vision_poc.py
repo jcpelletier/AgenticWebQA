@@ -524,8 +524,23 @@ class RunOutcome:
     error: Optional[str] = None
 
 
-def _check_text_present(page: Page, config: SuccessIndicatorConfig) -> bool:
-    """True if config.value (or compiled regex) found in page visible text."""
+def _check_text_present(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0) -> bool:
+    """True if config.value (or compiled regex) found in page visible text.
+
+    When timeout_ms > 0 and the value is a plain string, uses wait_for_function so
+    the check succeeds as soon as the text appears rather than at the instant of the call.
+    Regex patterns fall back to a point-in-time inner_text read.
+    """
+    if timeout_ms > 0 and config.compiled_pattern is None:
+        try:
+            page.wait_for_function(
+                "text => document.body.innerText.includes(text)",
+                arg=config.value,
+                timeout=timeout_ms,
+            )
+            return True
+        except Exception:
+            pass
     try:
         body_text = page.inner_text("body", timeout=5000)
     except Exception:
@@ -535,34 +550,62 @@ def _check_text_present(page: Page, config: SuccessIndicatorConfig) -> bool:
     return config.value in body_text
 
 
-def _check_selector_present(page: Page, config: SuccessIndicatorConfig) -> bool:
-    """True if the CSS selector in config.value matches at least one element."""
+def _check_selector_present(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0) -> bool:
+    """True if the CSS selector in config.value matches at least one element.
+
+    When timeout_ms > 0, waits up to that many ms for the element to appear in the
+    DOM (handles dynamically rendered content after navigation).
+    """
     try:
+        if timeout_ms > 0:
+            page.wait_for_selector(config.value, state="attached", timeout=timeout_ms)
+            return True
         return page.locator(config.value).count() > 0
     except Exception:
         return False
 
 
-def _check_url_match(page: Page, config: SuccessIndicatorConfig) -> bool:
-    """True if config.value (or compiled regex) matches the current page URL."""
+def _check_url_match(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0) -> bool:
+    """True if config.value (or compiled regex) matches the current page URL.
+
+    When timeout_ms > 0, uses wait_for_url so SPA hash-routing changes are caught
+    before falling back to a point-in-time URL read.
+    """
+    if timeout_ms > 0:
+        try:
+            if config.compiled_pattern is not None:
+                page.wait_for_url(config.compiled_pattern, timeout=timeout_ms)
+            else:
+                page.wait_for_url(re.compile(re.escape(config.value)), timeout=timeout_ms)
+            return True
+        except Exception:
+            pass
     url = page.url
     if config.compiled_pattern is not None:
-        return bool(config.compiled_pattern.search(url))
-    return config.value in url
+        matched = bool(config.compiled_pattern.search(url))
+        if not matched:
+            _log_info(f"[deterministic] url_match: pattern {config.value!r} did not match URL {url!r}")
+        return matched
+    matched = config.value in url
+    if not matched:
+        _log_info(f"[deterministic] url_match: {config.value!r} not found in URL {url!r}")
+    return matched
 
 
-def check_deterministic_success(page: Page, config: SuccessIndicatorConfig) -> bool:
+def check_deterministic_success(page: Page, config: SuccessIndicatorConfig, *, timeout_ms: int = 0) -> bool:
     """Dispatch to the correct deterministic Playwright check.
 
     Returns True when the success condition is met.
     Always returns False for VISUAL_LLM (handled by LLM verify guard instead).
+    When timeout_ms > 0, each check uses Playwright-native waiting so async page
+    changes (SPA routing, dynamic rendering) are caught before the verdict is made.
     """
     if config.type == SuccessIndicatorType.TEXT_PRESENT:
-        return _check_text_present(page, config)
+        return _check_text_present(page, config, timeout_ms=timeout_ms)
     if config.type == SuccessIndicatorType.SELECTOR_PRESENT:
-        return _check_selector_present(page, config)
+        return _check_selector_present(page, config, timeout_ms=timeout_ms)
     if config.type == SuccessIndicatorType.URL_MATCH:
-        return _check_url_match(page, config)
+        return _check_url_match(page, config, timeout_ms=timeout_ms)
     return False
 
 
@@ -7279,11 +7322,9 @@ def run_cli_with_args(args: Any) -> None:
                     if args.success_indicator.type != SuccessIndicatorType.VISUAL_LLM:
                         if args.verify_wait and args.verify_wait > 0:
                             time.sleep(args.verify_wait)
-                        try:
-                            page.wait_for_load_state("domcontentloaded", timeout=5000)
-                        except Exception:
-                            pass
-                        det_ok = check_deterministic_success(page, args.success_indicator)
+                        det_ok = check_deterministic_success(
+                            page, args.success_indicator, timeout_ms=10000
+                        )
                         if det_ok:
                             _log_info(
                                 f"[deterministic] {args.success_indicator.type.value} matched: {args.success_indicator.value!r}"
