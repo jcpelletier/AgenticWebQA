@@ -1,0 +1,65 @@
+{
+  "login_demo": {
+    "prompt": "Log in with username 'demo' and password 'demo123'.\n1. Fill in the username field\n2. Fill in the password field\n3. Click Log in",
+    "success_criteria": "You are on the Home page and see 'Welcome, demo'.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "login_demo",
+    "model": "claude-opus-4-6"
+  },
+  "logout": {
+    "prompt": "Log in with username 'demo' and password 'demo123'.\n1. Fill in the username field\n2. Fill in the password field\n3. Click Log in\n4. Log out",
+    "success_criteria": "The user is on the sign in page after logging out.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "login_demo,logout",
+    "model": "claude-haiku-4-5"
+  },
+  "register": {
+    "prompt": "Register a new account with username user_{rand_string} and password pass1_{rand_string}, log out, then log back in with the same credentials.\n1. Click on the registration link\n2. Select the username field\n3. Fill username\n4. Select the password field\n5. Fill password\n6. Press the Register button",
+    "success_criteria": "You are on the Home page after logging in with the newly registered account and the page shows 'Welcome, user_'.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "register_account",
+    "model": "claude-sonnet-4-6"
+  },
+  "profile_open": {
+    "prompt": "1. Register an account\n2. Open Profile from the header.",
+    "success_criteria": "The user is on the profile page.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "register_account,profile_open",
+    "model": "claude-sonnet-4-6"
+  },
+  "profile_about_edit": {
+    "prompt": "1. Register an account\n2. Open Profile from the header.\n3. Enter About me text: {rand_string}\n4. Click Save.\n5. Reload the page.",
+    "success_criteria": "You are on the Profile page, and the About me value {rand_string} is present.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "register_account,profile_open,profile_aboutedit",
+    "model": "claude-sonnet-4-6"
+  },
+  "profile_location_canada": {
+    "prompt": "1. Register an account\n2. Open Profile from the header.\n3. Set Country to Canada and save.\n4. Refresh the page.",
+    "success_criteria": "The user is on the Profile page with Country set to Canada after refreshing.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "register_account,profile_open,profile_location_canada",
+    "model": "claude-sonnet-4-6"
+  },
+  "profile_location_us_california": {
+    "prompt": "1. Register an account\n2. Open Profile from the header.\n3. Set Country to United States of America.\n4. Set State to California and save.\n5. Refresh the page.",
+    "success_criteria": "The user is on the Profile page with Country set to United States of America and State set to California after refreshing.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "register_account,profile_open,profile_location_uscalifornia",
+    "model": "claude-sonnet-4-6"
+  },
+  "activity_feed": {
+    "prompt": "1. Log in with username 'demo' and password 'demo123'.\n2. On the home page, find the Activity Feed section below the welcome text.\n3. Click the message input field, type 'Hello {rand_string}', and click the Post button.\n4. Confirm 'Hello {rand_string}' appears in the feed with a Delete button visible.",
+    "success_criteria": "The Activity Feed shows a post with text 'Hello {rand_string}' and a Delete button is visible next to it.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "login_demo,activity_feed",
+    "model": "claude-sonnet-4-6"
+  },
+  "display_name": {
+    "prompt": "1. Register an account\n2. Open Profile from the header.\n3. In the Display name field, enter: {rand_string}\n4. Click Save.\n5. Click Home in the header navigation.\n6. Confirm the welcome text shows {rand_string}.\n7. Click Profile in the header navigation.\n8. Clear the Display name field (select all and delete).\n9. Click Save.\n10. Click Home in the header navigation.",
+    "success_criteria": "The home page welcome text shows 'Welcome, user_{rand_string}' using the username as fallback after the display name was cleared.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "register_account,profile_open,profile_displayname",
+    "model": "claude-sonnet-4-6"
+  }
+}

@@ -1,0 +1,8 @@
+*.log
+/agent_view/
+/Models/
+site_hints.json
+vision_playwright_openai_vision_ui.required.tmp
+__pycache__/
+*.py[cod]
+*.bak

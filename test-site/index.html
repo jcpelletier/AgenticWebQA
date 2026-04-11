@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Demo Login</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="page">
+    <main class="card">
+      <h1>Demo Login</h1>
+      <p class="hint">Use username <strong>demo</strong> and password <strong>demo123</strong>.</p>
+      <form id="login-form" data-testid="login-form">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          name="username"
+          data-testid="username"
+          autocomplete="username"
+          required
+        />
+
+        <label for="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          data-testid="password"
+          autocomplete="current-password"
+          required
+        />
+
+        <button id="login-button" data-testid="login-button" type="submit">Log in</button>
+        <p id="login-error" role="alert" class="error" hidden>Invalid credentials.</p>
+        <p class="alt-action">
+          Need an account?
+          <a id="register-link" data-testid="register-link" href="register.html">Create account</a>
+        </p>
+      </form>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

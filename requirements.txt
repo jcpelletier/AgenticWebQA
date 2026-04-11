@@ -1,0 +1,11 @@
+openai
+anthropic
+playwright
+pillow
+ttkbootstrap
+azure-monitor-opentelemetry
+pytest
+mypy
+pyinstaller
+ruff
+mcp

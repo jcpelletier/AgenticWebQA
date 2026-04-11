@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Home</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="page">
+    <header class="topbar site-header" data-testid="site-header">
+      <nav class="site-nav" aria-label="Main navigation">
+        <span class="active-label" data-testid="nav-home" aria-current="page">Home</span>
+        <a id="profile-link" data-testid="nav-profile" href="profile.html">Profile</a>
+      </nav>
+      <button id="logout-button" data-testid="logout-button" type="button">Log out</button>
+    </header>
+    <main class="card home-card">
+      <h1 data-testid="home-title">Home</h1>
+      <p id="welcome" data-testid="welcome-text">Welcome, <span id="user-name">demo</span>.</p>
+      <p class="muted">This is a local test page for the login flow.</p>
+      <section id="activity-feed" class="activity-feed-section">
+        <h2>Activity Feed</h2>
+        <div class="feed-post-form">
+          <label for="feed-post-input">Post a message</label>
+          <input
+            id="feed-post-input"
+            data-testid="feed-post-input"
+            type="text"
+            maxlength="140"
+            placeholder="What's on your mind? (max 140 characters)"
+          />
+          <button id="feed-post-button" data-testid="feed-post-button" type="button">Post</button>
+        </div>
+        <div id="feed-container" data-testid="feed-container"></div>
+      </section>
+      <section id="quiz-card" class="quiz-card" data-testid="quiz-card" aria-live="polite">
+        <div class="quiz-header">
+          <h2 id="quiz-title" data-testid="quiz-title">Home Quiz</h2>
+          <p id="quiz-progress" class="quiz-progress" data-testid="quiz-progress"></p>
+        </div>
+        <div id="quiz-questions" class="quiz-questions" data-testid="quiz-questions"></div>
+        <div id="quiz-summary" class="quiz-summary" data-testid="quiz-summary" hidden>
+          <p id="quiz-percent" data-testid="quiz-percent"></p>
+          <p id="quiz-overall-status" data-testid="quiz-overall-status"></p>
+        </div>
+        <button
+          id="quiz-next-button"
+          data-testid="quiz-next-button"
+          type="button"
+          class="quiz-next-button"
+          hidden
+        >
+          Next Quiz
+        </button>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -rn \"AGENTICWEBQA\\\\|environ\\\\|getenv\" /c/Users/genes/GitHub/AgenticWebQA/*.py)",
+      "Bash(python -c \"import playwright; print\\(''playwright ok''\\)\")",
+      "Bash(python -u vision_playwright_openai_vision_poc.py --prompt \"Log in with username ''demo'' and password ''demo123'', open Profile, and update Country and State.:*)",
+      "Bash(python -c \":*)",
+      "Bash(python -c \"import json; m=json.load\\(open\\(''c:/Users/genes/GitHub/AgenticWebQA/Models/http_127_0_0_1_8000_index_html.json''\\)\\); fns=m.get\\(''functions'',[]\\); [print\\(f[''name''],'':'',f.get\\(''steps'',''NO STEPS''\\)[:80] if isinstance\\(f.get\\(''steps''\\),str\\) else f.get\\(''steps'',''NO STEPS''\\)\\) for f in fns if ''logout'' in f.get\\(''name'',''''\\).lower\\(\\)]\")"
+    ]
+  }
+}

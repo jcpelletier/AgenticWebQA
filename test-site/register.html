@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create Account</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="page">
+    <main class="card">
+      <h1>Create Account</h1>
+      <p class="hint">Usernames are unique. Password must be at least 8 characters.</p>
+      <form id="register-form" data-testid="register-form">
+        <label for="register-username">Username</label>
+        <input
+          id="register-username"
+          name="register-username"
+          data-testid="register-username"
+          autocomplete="username"
+          required
+        />
+
+        <label for="register-password">Password</label>
+        <input
+          id="register-password"
+          name="register-password"
+          type="password"
+          data-testid="register-password"
+          autocomplete="new-password"
+          required
+        />
+
+        <button id="register-button" data-testid="register-button" type="submit">
+          Register
+        </button>
+        <p id="register-error" data-testid="register-error" role="alert" class="error" hidden></p>
+        <p class="alt-action">
+          Already have an account?
+          <a id="back-to-login" data-testid="back-to-login" href="index.html">Back to login</a>
+        </p>
+      </form>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
