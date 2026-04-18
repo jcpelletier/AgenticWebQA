@@ -97,7 +97,8 @@
       "WebFetch(domain:ai.google.dev)",
       "Bash(python -m pytest tests/test_gemini_provider.py -v)",
       "Bash(python -m pytest --tb=short -q)",
-      "Bash(python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash)"
+      "Bash(python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash)",
+      "Bash(python -u precommit_smoketest.py)"
     ],
     "additionalDirectories": [
       "c:\\Users\\genes\\GitHub\\AgenticWebQA"
