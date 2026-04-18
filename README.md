@@ -367,9 +367,8 @@ In the UI (`vision_playwright_openai_vision_ui.py`), the Model dropdown includes
 **Google Gemini** — `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`
 
 Recommendation:
-- Use `claude-sonnet-4-6` for LLM training runs and difficult sites.
-- Use `gemini-2.5-flash` for fast, cost-effective runs when a Gemini API key is available.
-- Use smaller models for cheaper exploratory runs when needed.
+- Use a model like `claude-sonnet-4-6` for LLM training runs and difficult sites.
+- Use a small model like `gemini-2.5-flash` or 'Haiku 4.5' for cost-effective runs.
 
 The dropdown value maps directly to the CLI `--model` flag; the provider is inferred from the model name prefix.
 
@@ -392,8 +391,6 @@ Required:
   - `--text-present-success`: Pass when this text appears in visible page text. Prefix with `regex:` for regex matching.
   - `--selector-present-success`: Pass when this CSS selector matches at least one element.
   - `--url-match-success`: Pass when the current URL contains this string. Prefix with `regex:` for regex matching.
-
-> **Removed:** `--success-criteria` was replaced by `--visual-llm-success`. Passing `--success-criteria` now exits with a deprecation error.
 
 Optional:
 - `--actions`: Comma-separated list of action functions to allow (recommended allowlist).
@@ -577,7 +574,6 @@ python .\vision_playwright_openai_vision_ui.py
 
 In the UI:
 - Choose your model from the dropdown (see "UI Model Selection (Dropdown)").
-- Prefer `gpt-5.1` for training/learning runs.
 - Run headed when you want to use manual click interjection.
 
 ## Key Files
