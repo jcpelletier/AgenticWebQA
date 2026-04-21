@@ -106,7 +106,7 @@ jobs:
       - name: Run Login Flow (learn)
         shell: pwsh
         env:
-          ANTHROPIC_API_KEY: ${{ vars.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           python -u .\vision_playwright_openai_vision_poc.py `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
@@ -148,7 +148,7 @@ jobs:
       - name: Run Login Flow (auto-heal)
         shell: pwsh
         env:
-          ANTHROPIC_API_KEY: ${{ vars.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           python -u .\vision_playwright_openai_vision_poc.py `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
@@ -170,7 +170,7 @@ jobs:
       - name: Run Login Flow (reuse)
         shell: pwsh
         env:
-          ANTHROPIC_API_KEY: ${{ vars.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           python -u .\vision_playwright_openai_vision_poc.py `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
