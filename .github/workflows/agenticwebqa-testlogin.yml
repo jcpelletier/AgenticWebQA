@@ -106,7 +106,7 @@ jobs:
       - name: Run Login Flow (learn)
         shell: pwsh
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ vars.ANTHROPIC_API_KEY }}
         run: |
           python -u .\vision_playwright_openai_vision_poc.py `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
@@ -117,7 +117,7 @@ jobs:
             --headless `
             --verbose `
             --max-subactions-per-function 5 `
-            --model "gemini-2.5-flash-lite"
+            --model "claude-haiku-4-5"
 
       - name: Break saved selectors (auto-heal prep)
         shell: pwsh
@@ -148,7 +148,7 @@ jobs:
       - name: Run Login Flow (auto-heal)
         shell: pwsh
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ vars.ANTHROPIC_API_KEY }}
         run: |
           python -u .\vision_playwright_openai_vision_poc.py `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
@@ -159,7 +159,7 @@ jobs:
             --headless `
             --verbose `
             --max-subactions-per-function 5 `
-            --model "gemini-2.5-flash-lite" | Tee-Object -FilePath .\auto_heal_run.log
+            --model "claude-haiku-4-5" | Tee-Object -FilePath .\auto_heal_run.log
 
       - name: Reset agent_view (reuse)
         shell: pwsh
@@ -170,7 +170,7 @@ jobs:
       - name: Run Login Flow (reuse)
         shell: pwsh
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ vars.ANTHROPIC_API_KEY }}
         run: |
           python -u .\vision_playwright_openai_vision_poc.py `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
@@ -181,7 +181,7 @@ jobs:
             --headless `
             --verbose `
             --max-subactions-per-function 5 `
-            --model "gemini-2.5-flash-lite" | Tee-Object -FilePath .\reuse_run.log
+            --model "claude-haiku-4-5" | Tee-Object -FilePath .\reuse_run.log
 
       - name: Assert no vision fallback (reuse)
         shell: pwsh
