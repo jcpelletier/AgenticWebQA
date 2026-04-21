@@ -176,9 +176,7 @@ def _responses_req_to_chat_completions_req(req: Dict[str, Any]) -> Dict[str, Any
                 parts.append({"type": "text", "text": str(block.get("text") or "")})
             elif btype == "input_image":
                 image_url = str(block.get("image_url") or "")
-                parts.append(
-                    {"type": "image_url", "image_url": {"url": image_url}}
-                )
+                parts.append({"type": "image_url", "image_url": {"url": image_url}})
         if not parts:
             continue
         # Simplify to a plain string for non-user/single-text messages
@@ -203,7 +201,10 @@ def _responses_req_to_chat_completions_req(req: Dict[str, Any]) -> Dict[str, Any
     # Gemini needs more headroom than gpt-style models for JSON output.
     # Bump small token budgets so the model can complete structured responses.
     _GEMINI_MIN_JSON_TOKENS = 256
-    if "max_tokens" in chat_req and int(chat_req["max_tokens"]) < _GEMINI_MIN_JSON_TOKENS:
+    if (
+        "max_tokens" in chat_req
+        and int(chat_req["max_tokens"]) < _GEMINI_MIN_JSON_TOKENS
+    ):
         has_json_output = "response_format" in chat_req
         if has_json_output:
             chat_req["max_tokens"] = _GEMINI_MIN_JSON_TOKENS
@@ -218,8 +219,12 @@ class _ChatCompletionsUsageWrapper:
     def __init__(self, usage: Any) -> None:
         pt = getattr(usage, "prompt_tokens", None) if usage is not None else None
         ct = getattr(usage, "completion_tokens", None) if usage is not None else None
-        self.input_tokens: Optional[int] = int(pt) if isinstance(pt, (int, float)) else None
-        self.output_tokens: Optional[int] = int(ct) if isinstance(ct, (int, float)) else None
+        self.input_tokens: Optional[int] = (
+            int(pt) if isinstance(pt, (int, float)) else None
+        )
+        self.output_tokens: Optional[int] = (
+            int(ct) if isinstance(ct, (int, float)) else None
+        )
         self.cache_creation_input_tokens: Optional[int] = None
         self.cache_read_input_tokens: Optional[int] = None
 
@@ -6808,7 +6813,12 @@ def _request_next_action_response(
     if previous_response_id:
         req["previous_response_id"] = previous_response_id
 
+    _TRANSIENT_RETRY_STATUSES = {429, 500, 502, 503, 504}
+    _TRANSIENT_MAX_RETRIES = 3
+    _TRANSIENT_BACKOFF_BASE_S = 5.0
+
     attempts = 0
+    transient_retries = 0
     effort_retry_done = False
     while True:
         req_t0 = time.perf_counter()
@@ -6836,6 +6846,29 @@ def _request_next_action_response(
                 raise
         except Exception as e:
             msg = str(e)
+            # Transient check: status_code attribute is present on both
+            # openai.APIStatusError and anthropic.APIStatusError.
+            status = getattr(e, "status_code", None)
+            is_transient = status in _TRANSIENT_RETRY_STATUSES or isinstance(
+                e, (openai.APIConnectionError, openai.APITimeoutError)
+            )
+            # Also cover Anthropic-SDK connection/timeout errors (no status_code).
+            if not is_transient and anthropic_mod is not None:
+                for _exc_name in ("APIConnectionError", "APITimeoutError"):
+                    _exc_cls = getattr(anthropic_mod, _exc_name, None)
+                    if _exc_cls is not None and isinstance(e, _exc_cls):
+                        is_transient = True
+                        break
+            if is_transient and transient_retries < _TRANSIENT_MAX_RETRIES:
+                transient_retries += 1
+                attempts += 1
+                delay = _TRANSIENT_BACKOFF_BASE_S * (2 ** (transient_retries - 1))
+                _log_warn(
+                    f"[llm] Transient API error (attempt {transient_retries}/{_TRANSIENT_MAX_RETRIES},"
+                    f" status={status}): {e}. Retrying in {delay:.1f}s."
+                )
+                time.sleep(delay)
+                continue
             if (
                 not effort_retry_done
                 and "reasoning.effort" in msg
