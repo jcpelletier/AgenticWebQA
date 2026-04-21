@@ -2,7 +2,7 @@
 ![demo](https://github.com/user-attachments/assets/ca860220-c45e-47ff-83c0-444983349c5b)
 
 
-This project is a proof-of-concept browser automation agent that combines:
+This project is a browser automation agent that combines:
 - DOM-first interactions (Playwright locators) when targets can be identified, and
 - Vision-based fallback using a vision-capable LLM when DOM hints are missing or fail.
 
