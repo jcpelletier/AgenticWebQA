@@ -1,3 +1,5 @@
+[![Watch the video](https://img.youtube.com/vi/H4hI8wptfVg/maxresdefault.jpg)](https://youtu.be/H4hI8wptfVg)
+
 # Vision + DOM Hybrid Browser Agent
 ![demo](https://github.com/user-attachments/assets/ca860220-c45e-47ff-83c0-444983349c5b)
 
