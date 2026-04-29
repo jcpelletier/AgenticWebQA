@@ -1,4 +1,4 @@
-[![Watch the video](https://img.youtube.com/vi/H4hI8wptfVg/maxresdefault.jpg)](https://youtu.be/H4hI8wptfVg)
+
 
 # Vision + DOM Hybrid Browser Agent
 ![demo](https://github.com/user-attachments/assets/ca860220-c45e-47ff-83c0-444983349c5b)
@@ -13,6 +13,9 @@ The provider is inferred automatically from the model name; supply the matching 
 
 The main script is `vision_playwright_openai_vision_poc.py`.
 The optional GUI launcher is `vision_playwright_openai_vision_ui.py`.
+
+# Youtube Summary
+[![Watch the video](https://img.youtube.com/vi/H4hI8wptfVg/maxresdefault.jpg)](https://youtu.be/H4hI8wptfVg)
 
 ## Docs Index
 
