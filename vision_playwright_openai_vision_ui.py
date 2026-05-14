@@ -510,7 +510,7 @@ def main() -> None:
     build_action_settings_tab(tab_actions, vars_map)
     build_output_tab(tab_output, vars_map)
 
-    openai_key_var, anthropic_key_var, gemini_key_var, deepseek_key_var, _apply_api_key = (
+    openai_key_var, anthropic_key_var, gemini_key_var, _apply_api_key = (
         build_credentials_tab(
             tab_creds,
             root=root,
@@ -565,7 +565,6 @@ def main() -> None:
         openai_key_var=openai_key_var,
         anthropic_key_var=anthropic_key_var,
         gemini_key_var=gemini_key_var,
-        deepseek_key_var=deepseek_key_var,
     )
 
     app.continue_button.configure(command=lambda: _send_step_training_continue(app))

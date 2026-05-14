@@ -61,7 +61,6 @@ from config_shared import (
     DEFAULT_MODEL,
     DEFAULT_X_SIZE_PX,
     DEFAULT_X_THICKNESS_PX,
-    DEEPSEEK_BASE_URL,
     GEMINI_BASE_URL,
     SuccessIndicatorConfig,
     SuccessIndicatorType,
@@ -97,15 +96,6 @@ def _new_gemini_client(api_key: str) -> OpenAIClient:
             "openai.OpenAI is unavailable. Upgrade the openai package to a version that provides OpenAI client."
         )
     return cast(OpenAIClient, client_factory(api_key=api_key, base_url=GEMINI_BASE_URL))
-
-
-def _new_deepseek_client(api_key: str) -> OpenAIClient:
-    client_factory = OpenAI
-    if client_factory is None:
-        raise RuntimeError(
-            "openai.OpenAI is unavailable. Upgrade the openai package to a version that provides OpenAI client."
-        )
-    return cast(OpenAIClient, client_factory(api_key=api_key, base_url=DEEPSEEK_BASE_URL))
 
 
 def _new_anthropic_client(api_key: str) -> AnthropicClient:
@@ -274,7 +264,7 @@ class _ResponsesAdapter:
         self._client = client
 
     def create(self, **req: Any) -> Any:
-        if self._provider in ("gemini", "deepseek"):
+        if self._provider == "gemini":
             chat_req = _responses_req_to_chat_completions_req(req)
             cc_resp = self._client.chat.completions.create(**chat_req)
             return _ChatCompletionsResponseWrapper(cc_resp)
@@ -435,8 +425,6 @@ def _new_model_client(model_name: str, api_key: str) -> _ModelClientAdapter:
         return _ModelClientAdapter("anthropic", _new_anthropic_client(api_key))
     if provider == "gemini":
         return _ModelClientAdapter("gemini", _new_gemini_client(api_key))
-    if provider == "deepseek":
-        return _ModelClientAdapter("deepseek", _new_deepseek_client(api_key))
     return _ModelClientAdapter("openai", _new_openai_client(api_key))
 
 

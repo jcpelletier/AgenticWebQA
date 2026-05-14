@@ -169,7 +169,6 @@ def test_run_lifecycle_rejects_missing_gemini_key(
             openai_key_var=tk.StringVar(value=""),
             anthropic_key_var=tk.StringVar(value=""),
             gemini_key_var=tk.StringVar(value=""),
-            deepseek_key_var=tk.StringVar(value=""),
         )
 
         error_shown: list[str] = []

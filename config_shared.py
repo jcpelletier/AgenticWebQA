@@ -39,12 +39,7 @@ GEMINI_MODEL_OPTIONS = [
     "gemini-2.5-flash-lite",
 ]
 GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
-DEEPSEEK_MODEL_OPTIONS = [
-    "deepseek-v4-flash",
-    "deepseek-v4-pro",
-]
-DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
-MODEL_OPTIONS = OPENAI_MODEL_OPTIONS + CLAUDE_MODEL_OPTIONS + GEMINI_MODEL_OPTIONS + DEEPSEEK_MODEL_OPTIONS
+MODEL_OPTIONS = OPENAI_MODEL_OPTIONS + CLAUDE_MODEL_OPTIONS + GEMINI_MODEL_OPTIONS
 
 # Shared timing/token defaults
 DEFAULT_MAX_TOKENS_MARGIN = 512
@@ -407,14 +402,12 @@ SHARED_ARG_SPECS: Sequence[SharedArgSpec] = (
 )
 
 
-def infer_model_provider(model_name: str) -> Literal["openai", "anthropic", "gemini", "deepseek"]:
+def infer_model_provider(model_name: str) -> Literal["openai", "anthropic", "gemini"]:
     model = (model_name or "").strip().lower()
     if model.startswith("claude") or model.startswith("anthropic."):
         return "anthropic"
     if model.startswith("gemini"):
         return "gemini"
-    if model.startswith("deepseek"):
-        return "deepseek"
     return "openai"
 
 
@@ -424,8 +417,6 @@ def model_api_env_var(model_name: str) -> str:
         return "ANTHROPIC_API_KEY"
     if provider == "gemini":
         return "GEMINI_API_KEY"
-    if provider == "deepseek":
-        return "DEEPSEEK_API_KEY"
     return "OPENAI_API_KEY"
 
 
