@@ -17,7 +17,7 @@ def build_credentials_tab(
     add_field_help: Callable[[tk.Widget, str, int], None],
     add_labeled_entry: Callable[[tk.Widget, str, tk.Variable, int, str], None],
     add_labeled_password: Callable[[tk.Widget, str, tk.Variable, int, str], None],
-) -> Tuple[tk.StringVar, tk.StringVar, tk.StringVar, Callable[[], None]]:
+) -> Tuple[tk.StringVar, tk.StringVar, tk.StringVar, tk.StringVar, Callable[[], None]]:
     openai_key_var = tk.StringVar(
         value=(os.environ.get("OPENAI_API_KEY") or "").strip()
     )
@@ -27,11 +27,15 @@ def build_credentials_tab(
     gemini_key_var = tk.StringVar(
         value=(os.environ.get("GEMINI_API_KEY") or "").strip()
     )
+    deepseek_key_var = tk.StringVar(
+        value=(os.environ.get("DEEPSEEK_API_KEY") or "").strip()
+    )
 
     def _set_api_status() -> None:
         openai_current = (openai_key_var.get() or "").strip()
         anthropic_current = (anthropic_key_var.get() or "").strip()
         gemini_current = (gemini_key_var.get() or "").strip()
+        deepseek_current = (deepseek_key_var.get() or "").strip()
         openai_status_label.configure(
             text=("OK" if openai_current else "MISSING"),
             foreground=("green" if openai_current else "red"),
@@ -43,6 +47,10 @@ def build_credentials_tab(
         gemini_status_label.configure(
             text=("OK" if gemini_current else "MISSING"),
             foreground=("green" if gemini_current else "red"),
+        )
+        deepseek_status_label.configure(
+            text=("OK" if deepseek_current else "MISSING"),
+            foreground=("green" if deepseek_current else "red"),
         )
 
     def _apply_api_key() -> None:
@@ -61,6 +69,11 @@ def build_credentials_tab(
             os.environ["GEMINI_API_KEY"] = gemini_raw
         else:
             os.environ.pop("GEMINI_API_KEY", None)
+        deepseek_raw = (deepseek_key_var.get() or "").strip()
+        if deepseek_raw:
+            os.environ["DEEPSEEK_API_KEY"] = deepseek_raw
+        else:
+            os.environ.pop("DEEPSEEK_API_KEY", None)
         _set_api_status()
 
     creds_api_card = ttk.Frame(
@@ -75,7 +88,7 @@ def build_credentials_tab(
     )
     add_field_help(
         creds_api_card,
-        "API key fields map to environment variables: OPENAI_API_KEY, ANTHROPIC_API_KEY, and GEMINI_API_KEY",
+        "API key fields map to environment variables: OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, and DEEPSEEK_API_KEY",
         0,
     )
     creds_key_row = ttk.Frame(creds_api_card)
@@ -114,6 +127,18 @@ def build_credentials_tab(
     gemini_status_label.pack(side="left", padx=(8, 0))
     gemini_key_row.pack(anchor="w", pady=2, fill="x")
 
+    deepseek_key_row = ttk.Frame(creds_api_card)
+    ttk.Label(deepseek_key_row, text="DeepSeek API Key", width=18, anchor="w").pack(
+        side="left", padx=(0, 8)
+    )
+    deepseek_entry = ttk.Entry(
+        deepseek_key_row, width=30, show="*", textvariable=deepseek_key_var
+    )
+    deepseek_entry.pack(side="left")
+    deepseek_status_label = ttk.Label(deepseek_key_row, text="")
+    deepseek_status_label.pack(side="left", padx=(8, 0))
+    deepseek_key_row.pack(anchor="w", pady=2, fill="x")
+
     ttk.Button(creds_api_card, text="Apply", command=_apply_api_key).pack(
         anchor="w", pady=(6, 0)
     )
@@ -131,6 +156,9 @@ def build_credentials_tab(
     gemini_entry.bind("<KeyRelease>", _api_key_changed)
     gemini_entry.bind("<<Paste>>", _api_key_changed)
     gemini_entry.bind("<FocusOut>", _api_key_changed)
+    deepseek_entry.bind("<KeyRelease>", _api_key_changed)
+    deepseek_entry.bind("<<Paste>>", _api_key_changed)
+    deepseek_entry.bind("<FocusOut>", _api_key_changed)
 
     vars_map["-USERNAME-"].set((os.environ.get("AGENTICWEBQA_USERNAME") or "").strip())
     vars_map["-PASSWORD-"].set(os.environ.get("AGENTICWEBQA_PASSWORD") or "")
@@ -195,7 +223,7 @@ def build_credentials_tab(
         password_entry.bind("<<Paste>>", _creds_changed)
         password_entry.bind("<FocusOut>", _creds_changed)
 
-    return openai_key_var, anthropic_key_var, gemini_key_var, _apply_api_key
+    return openai_key_var, anthropic_key_var, gemini_key_var, deepseek_key_var, _apply_api_key
 
 
 def build_run_log_panel(
