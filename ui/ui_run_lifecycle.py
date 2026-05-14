@@ -103,10 +103,13 @@ def build_run_lifecycle(
         openai_key = (app.openai_key_var.get() or "").strip()
         anthropic_key = (app.anthropic_key_var.get() or "").strip()
         gemini_key = (app.gemini_key_var.get() or "").strip()
+        deepseek_key = (app.deepseek_key_var.get() or "").strip()
         if provider == "anthropic":
             required_key = anthropic_key
         elif provider == "gemini":
             required_key = gemini_key
+        elif provider == "deepseek":
+            required_key = deepseek_key
         else:
             required_key = openai_key
         if not required_key:
@@ -144,6 +147,8 @@ def build_run_lifecycle(
             env["ANTHROPIC_API_KEY"] = anthropic_key
         if gemini_key:
             env["GEMINI_API_KEY"] = gemini_key
+        if deepseek_key:
+            env["DEEPSEEK_API_KEY"] = deepseek_key
         username = str(values.get("-USERNAME-") or "").strip()
         password = str(values.get("-PASSWORD-") or "")
         if username:
