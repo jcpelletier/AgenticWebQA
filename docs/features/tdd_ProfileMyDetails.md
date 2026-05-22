@@ -119,7 +119,7 @@ Subagent routing decision: `QA_WebAutomation` was invoked via QAManager (feature
 - [x] Update `release_test.py` to include the new ProfileMyDetails e2e smoke step. (`REQ-1`..`REQ-5`)
 - [x] Run `python -m pytest -q tests/test_profilemydetails_contract.py` and record result in Test Execution Evidence. (`TEST-UNIT-PROFILEMYDETAILS-001`..`-004`) — **15 passed**
 - [x] Run `python ./precommit_smoketest.py` and record result in Test Execution Evidence. — **PASS (78 unit tests + login smoke)**
-- [ ] Run `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model claude-sonnet-4-6` and record result in Test Execution Evidence. (`TEST-SMOKE-PROFILEMYDETAILS-001`..`-003`)
+- [ ] Run `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model Sonnet 4.6` and record result in Test Execution Evidence. (`TEST-SMOKE-PROFILEMYDETAILS-001`..`-003`)
 - [ ] Run regression smokes (`run_testprofilepage_local.py`, `run_testprofilelocation_local.py`) and record results in Test Execution Evidence. (`TEST-REGRESSION-PROFILEPAGE-001`, `TEST-REGRESSION-PROFILELOC-001`)
 - [x] Record all test commands and pass outcomes in Test Execution Evidence section of this TDD.
 - [x] Confirm `Sub-Agent Output Verification` section is complete with all required fields for each subagent.
@@ -319,11 +319,11 @@ python -m pytest -q tests/test_profilemydetails_contract.py
 python -m pytest -q tests/
 
 # Feature smoke (run after implementation)
-python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model claude-sonnet-4-6
+python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model Sonnet 4.6
 
 # Regression smokes
-python ./webtests/run_testprofilepage_local.py --skip-install --require-feature --model claude-sonnet-4-6
-python ./webtests/run_testprofilelocation_local.py --skip-install --require-feature --model claude-sonnet-4-6
+python ./webtests/run_testprofilepage_local.py --skip-install --require-feature --model Sonnet 4.6
+python ./webtests/run_testprofilelocation_local.py --skip-install --require-feature --model Sonnet 4.6
 
 # Pre-commit (run after all implementation)
 python ./precommit_smoketest.py
@@ -337,18 +337,18 @@ python ./precommit_smoketest.py
 |----------------|---------|-----------|---------|
 | REQ-1 | TEST-UNIT-PROFILEMYDETAILS-001 | Unit | `python -m pytest -q tests/test_profilemydetails_contract.py` |
 | REQ-1 | TEST-UNIT-PROFILEMYDETAILS-004 | Unit | `python -m pytest -q tests/test_profilemydetails_contract.py` |
-| REQ-1 | TEST-SMOKE-PROFILEMYDETAILS-001 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model claude-sonnet-4-6` |
+| REQ-1 | TEST-SMOKE-PROFILEMYDETAILS-001 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model Sonnet 4.6` |
 | REQ-2 | TEST-UNIT-PROFILEMYDETAILS-002 | Unit | `python -m pytest -q tests/test_profilemydetails_contract.py` |
-| REQ-2 | TEST-SMOKE-PROFILEMYDETAILS-002 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model claude-sonnet-4-6` |
-| REQ-2 | TEST-INTEG-PROFILEMYDETAILS-001 | Integration | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model claude-sonnet-4-6` |
+| REQ-2 | TEST-SMOKE-PROFILEMYDETAILS-002 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model Sonnet 4.6` |
+| REQ-2 | TEST-INTEG-PROFILEMYDETAILS-001 | Integration | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model Sonnet 4.6` |
 | REQ-3 | TEST-UNIT-PROFILEMYDETAILS-002 | Unit | `python -m pytest -q tests/test_profilemydetails_contract.py` |
-| REQ-3 | TEST-SMOKE-PROFILEMYDETAILS-002 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model claude-sonnet-4-6` |
+| REQ-3 | TEST-SMOKE-PROFILEMYDETAILS-002 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model Sonnet 4.6` |
 | REQ-4 | TEST-UNIT-PROFILEMYDETAILS-003 | Unit | `python -m pytest -q tests/test_profilemydetails_contract.py` |
-| REQ-4 | TEST-SMOKE-PROFILEMYDETAILS-003 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model claude-sonnet-4-6` |
+| REQ-4 | TEST-SMOKE-PROFILEMYDETAILS-003 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model Sonnet 4.6` |
 | REQ-5 | TEST-UNIT-PROFILEMYDETAILS-001 | Unit | `python -m pytest -q tests/test_profilemydetails_contract.py` |
-| REQ-5 | TEST-SMOKE-PROFILEMYDETAILS-001 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model claude-sonnet-4-6` |
-| REQ-1..REQ-5 | TEST-REGRESSION-PROFILEPAGE-001 | Regression Smoke | `python ./webtests/run_testprofilepage_local.py --skip-install --require-feature --model claude-sonnet-4-6` |
-| REQ-1..REQ-5 | TEST-REGRESSION-PROFILELOC-001 | Regression Smoke | `python ./webtests/run_testprofilelocation_local.py --skip-install --require-feature --model claude-sonnet-4-6` |
+| REQ-5 | TEST-SMOKE-PROFILEMYDETAILS-001 | Smoke | `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model Sonnet 4.6` |
+| REQ-1..REQ-5 | TEST-REGRESSION-PROFILEPAGE-001 | Regression Smoke | `python ./webtests/run_testprofilepage_local.py --skip-install --require-feature --model Sonnet 4.6` |
+| REQ-1..REQ-5 | TEST-REGRESSION-PROFILELOC-001 | Regression Smoke | `python ./webtests/run_testprofilelocation_local.py --skip-install --require-feature --model Sonnet 4.6` |
 
 ### Gaps and NOT TESTED Items
 
@@ -364,9 +364,9 @@ python ./precommit_smoketest.py
 | `python -m pytest -q tests/test_profilemydetails_contract.py` | 0 | N/A | 15 passed in 0.06s |
 | `python -m pytest -q tests/` | 0 | N/A | 78 passed in 1.43s (no regressions) |
 | `python ./precommit_smoketest.py` | 0 | N/A | ruff format + mypy + 78 pytest passed + login smoke FINAL: PASS |
-| `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model claude-sonnet-4-6` | ___ | ___ | `profilemydetails_run.log` (pending e2e run) |
-| `python ./webtests/run_testprofilepage_local.py --skip-install --require-feature --model claude-sonnet-4-6` | ___ | ___ | `profilepage_run.log` (pending regression run) |
-| `python ./webtests/run_testprofilelocation_local.py --skip-install --require-feature --model claude-sonnet-4-6` | ___ | ___ | `profilelocation_run.log` (pending regression run) |
+| `python ./webtests/run_testprofilemydetails_local.py --skip-install --require-feature --model Sonnet 4.6` | ___ | ___ | `profilemydetails_run.log` (pending e2e run) |
+| `python ./webtests/run_testprofilepage_local.py --skip-install --require-feature --model Sonnet 4.6` | ___ | ___ | `profilepage_run.log` (pending regression run) |
+| `python ./webtests/run_testprofilelocation_local.py --skip-install --require-feature --model Sonnet 4.6` | ___ | ___ | `profilelocation_run.log` (pending regression run) |
 
 ---
 
@@ -400,12 +400,12 @@ python ./precommit_smoketest.py
 | Field | Value |
 |-------|-------|
 | Scope Reviewed | TDD (not yet created at audit time), `tests/test_profile_mydetails.py` (missing), `webtests/run_testprofilemydetails_local.py` (missing), `test-site/app.js` normalizeSavedProfile, `test-site/profile.html` |
-| Findings (ordered by severity) | (F-1 CRITICAL) Feature not in test-site; (F-2 CRITICAL) TDD absent; (F-3 CRITICAL) unit test module absent; (F-4 CRITICAL) smoke script absent; (F-5 HIGH) pytest command non-runnable (file missing); (F-6 HIGH) `--model gpt-5.1` is an invalid model identifier — corrected to `claude-sonnet-4-6` in this TDD; (F-7 HIGH) precommit_smoketest.py has no My Details coverage; (F-8 HIGH) TEST-REGRESSION-PROFILE-01 under-specified — addressed with explicit commands above; (F-9 MEDIUM) backward-compat test unrunnable until feature is implemented; (F-10 MEDIUM) AC-4 icon coverage has no unit-level fallback — addressed with TEST-UNIT-PROFILEMYDETAILS-003; (F-11 LOW) no validation-error test cases — noted as NOT TESTED gap above |
+| Findings (ordered by severity) | (F-1 CRITICAL) Feature not in test-site; (F-2 CRITICAL) TDD absent; (F-3 CRITICAL) unit test module absent; (F-4 CRITICAL) smoke script absent; (F-5 HIGH) pytest command non-runnable (file missing); (F-6 HIGH) `--model gpt 5.4` is an invalid model identifier — corrected to `Sonnet 4.6` in this TDD; (F-7 HIGH) precommit_smoketest.py has no My Details coverage; (F-8 HIGH) TEST-REGRESSION-PROFILE-01 under-specified — addressed with explicit commands above; (F-9 MEDIUM) backward-compat test unrunnable until feature is implemented; (F-10 MEDIUM) AC-4 icon coverage has no unit-level fallback — addressed with TEST-UNIT-PROFILEMYDETAILS-003; (F-11 LOW) no validation-error test cases — noted as NOT TESTED gap above |
 | Requirement Traceability | REQ-1..REQ-5: all NOT TESTED (pre-implementation) — full matrix above |
 | Commands Run | All feature-specific commands non-runnable (artifacts missing); `python ./precommit_smoketest.py` exists but contains no My Details coverage |
 | Artifacts | None for this feature; baseline 63 pytest passes |
-| Risks/Unknowns | R-1: Pre-implementation traceability package (expected); R-2: gpt-5.1 typo corrected to claude-sonnet-4-6; R-3: precommit false-signal risk noted; R-4: IANA list source unspecified — addressed in Technical Design; R-5: --require-feature skip semantics documented in smoke design |
+| Risks/Unknowns | R-1: Pre-implementation traceability package (expected); R-2: gpt 5.4 typo corrected to Sonnet 4.6; R-3: precommit false-signal risk noted; R-4: IANA list source unspecified — addressed in Technical Design; R-5: --require-feature skip semantics documented in smoke design |
 | Recommended Verdict | FAIL (pre-implementation — expected; zero runnable test artifacts at audit time) |
 | Status | COMPLETE |
 
-**Reconciliation note:** The traceability reviewer flagged `--model gpt-5.1` as an invalid model identifier. All smoke commands in this TDD have been corrected to use `--model claude-sonnet-4-6`, consistent with existing profile test scripts per `CLAUDE.md`.
+**Reconciliation note:** The traceability reviewer flagged `--model gpt 5.4` as an invalid model identifier. All smoke commands in this TDD have been corrected to use `--model Sonnet 4.6`, consistent with existing profile test scripts per `CLAUDE.md`.

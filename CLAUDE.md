@@ -16,13 +16,13 @@ Each tab entry includes a `success_type` field (`"Visual (LLM)"`, `"Text Present
 
 | Tab title        | Script                              | Model              | Actions                                                                  |
 |------------------|-------------------------------------|--------------------|--------------------------------------------------------------------------|
-| Login_demo       | run_testlogin_local.py              | claude-opus-4-6    | login_demo                                                               |
-| Logout           | run_testlogout_local.py             | claude-haiku-4-5   | login_demo,logout                                                        |
-| Register         | run_testregister_local.py           | claude-sonnet-4-6  | register_account                                                         |
-| ProfileOpen      | run_testprofileopen_local.py        | claude-sonnet-4-6  | register_account,profile_open                                            |
-| ProfileAboutEdit | run_testprofilepage_local.py        | claude-sonnet-4-6  | register_account,profile_open,profile_aboutedit                          |
-| ProfileLocationCanada      | run_testprofilelocation_local.py    | claude-sonnet-4-6  | register_account,profile_open,profile_location_canada        |
-| ProfileLocationUSCalifornia | run_testprofilelocationus_local.py  | claude-sonnet-4-6  | register_account,profile_open,profile_location_uscalifornia  |
+| Login_demo       | run_testlogin_local.py              | Opus 4.6           | login_demo                                                               |
+| Logout           | run_testlogout_local.py             | Haiku 4.5          | login_demo,logout                                                        |
+| Register         | run_testregister_local.py           | Sonnet 4.6         | register_account                                                         |
+| ProfileOpen      | run_testprofileopen_local.py        | Sonnet 4.6         | register_account,profile_open                                            |
+| ProfileAboutEdit | run_testprofilepage_local.py        | Sonnet 4.6         | register_account,profile_open,profile_aboutedit                          |
+| ProfileLocationCanada      | run_testprofilelocation_local.py    | Sonnet 4.6         | register_account,profile_open,profile_location_canada        |
+| ProfileLocationUSCalifornia | run_testprofilelocationus_local.py  | Sonnet 4.6         | register_account,profile_open,profile_location_uscalifornia  |
 
 ### rand_string substitution
 
@@ -49,10 +49,10 @@ Runs: Login → SearchForMovie → OpenMovieDetails → CheckForSubs against `ht
 
 | Tab title        | Model             | Actions                              |
 |------------------|-------------------|--------------------------------------|
-| Login            | claude-sonnet-4-6 | login                                |
-| SearchForMovie   | claude-sonnet-4-6 | login, search_movie                  |
-| OpenMovieDetails | claude-sonnet-4-6 | login, search_movie, open_moviedetails |
-| CheckForSubs     | claude-sonnet-4-6 | login, search_movie, open_moviedetails |
+| Login            | Sonnet 4.6 | login                                |
+| SearchForMovie   | Sonnet 4.6 | login, search_movie                  |
+| OpenMovieDetails | Sonnet 4.6 | login, search_movie, open_moviedetails |
+| CheckForSubs     | Sonnet 4.6 | login, search_movie, open_moviedetails |
 
 ## Writing Tests
 

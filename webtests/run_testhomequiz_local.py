@@ -13,7 +13,7 @@ from playwright.sync_api import sync_playwright
 
 START_URL = "http://127.0.0.1:8000/index.html"
 HOMEQUIZ_LOG = "homequiz_run.log"
-DEFAULT_MODEL = "gpt-5.1"
+DEFAULT_MODEL = "gpt-5.4"
 
 
 def run(cmd: list[str], cwd: Path, tee_path: Path | None = None) -> None:

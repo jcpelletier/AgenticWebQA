@@ -26,23 +26,23 @@ def test_infer_model_provider_returns_gemini_for_gemini_models() -> None:
 
 
 def test_infer_model_provider_gemini_prefix_variants() -> None:
-    assert infer_model_provider("gemini-2.0-flash") == "gemini"
+    assert infer_model_provider("gemini-2.5-flash") == "gemini"
     assert infer_model_provider("gemini-1.5-pro") == "gemini"
     assert infer_model_provider("GEMINI-2.0-flash") == "gemini"
 
 
 def test_infer_model_provider_non_gemini_unchanged() -> None:
-    assert infer_model_provider("gpt-5.1") == "openai"
+    assert infer_model_provider("gpt-5.4") == "openai"
     assert infer_model_provider("claude-sonnet-4-6") == "anthropic"
 
 
 def test_model_api_env_var_returns_gemini_key_for_gemini() -> None:
-    assert model_api_env_var("gemini-2.0-flash") == "GEMINI_API_KEY"
-    assert model_api_env_var("gemini-1.5-pro") == "GEMINI_API_KEY"
+    assert model_api_env_var("gemini-3.5-flash") == "GEMINI_API_KEY"
+    assert model_api_env_var("gemini-2.5-pro") == "GEMINI_API_KEY"
 
 
 def test_model_api_env_var_non_gemini_unchanged() -> None:
-    assert model_api_env_var("gpt-5.1") == "OPENAI_API_KEY"
+    assert model_api_env_var("gpt-5.4") == "OPENAI_API_KEY"
     assert model_api_env_var("claude-sonnet-4-6") == "ANTHROPIC_API_KEY"
 
 
@@ -68,8 +68,8 @@ def test_gemini_model_options_present_in_model_options() -> None:
 def test_model_options_preserves_openai_and_claude_entries() -> None:
     openai_models = [m for m in MODEL_OPTIONS if m.startswith("gpt-")]
     claude_models = [m for m in MODEL_OPTIONS if m.startswith("claude-")]
-    assert len(openai_models) >= 1, "OpenAI models missing from MODEL_OPTIONS"
-    assert len(claude_models) >= 3, "Claude models missing from MODEL_OPTIONS"
+    assert len(openai_models) >= 4, "OpenAI models missing from MODEL_OPTIONS"
+    assert len(claude_models) >= 5, "Claude models missing from MODEL_OPTIONS"
 
 
 # ---------------------------------------------------------------------------
@@ -80,7 +80,7 @@ def test_model_options_preserves_openai_and_claude_entries() -> None:
 def test_new_model_client_returns_gemini_provider() -> None:
     fake_client = MagicMock()
     with patch.object(poc, "_new_gemini_client", return_value=fake_client):
-        adapter = poc._new_model_client("gemini-2.0-flash", "fake-key")
+        adapter = poc._new_model_client("gemini-3.5-flash", "fake-key")
     assert adapter.provider == "gemini"
 
 
@@ -92,7 +92,7 @@ def test_new_model_client_gemini_uses_gemini_client_factory() -> None:
         return MagicMock()
 
     with patch.object(poc, "_new_gemini_client", side_effect=_fake_gemini_client):
-        poc._new_model_client("gemini-2.0-flash", "my-gemini-key")
+        poc._new_model_client("gemini-3.5-flash", "my-gemini-key")
 
     assert captured == ["my-gemini-key"]
 
@@ -120,7 +120,7 @@ def test_new_model_client_non_gemini_unchanged() -> None:
         patch.object(poc, "_new_openai_client", return_value=fake_openai),
         patch.object(poc, "_new_anthropic_client", return_value=fake_anthropic),
     ):
-        openai_adapter = poc._new_model_client("gpt-5.1", "key")
+        openai_adapter = poc._new_model_client("gpt-5.4", "key")
         anthropic_adapter = poc._new_model_client("claude-sonnet-4-6", "key")
 
     assert openai_adapter.provider == "openai"
@@ -188,7 +188,7 @@ def test_run_lifecycle_rejects_missing_gemini_key(
             return MagicMock()
 
         def _fake_get_fields() -> tuple:
-            model_var = tk.StringVar(value="gemini-2.0-flash")
+            model_var = tk.StringVar(value="gemini-3.5-flash")
             return (
                 MagicMock(),
                 MagicMock(),

@@ -78,7 +78,7 @@ Add Gemini as a third LLM provider by wiring `GEMINI_API_KEY` into the GUI crede
 
 ## Open Questions
 
-- Which Gemini models should be in the initial `GEMINI_MODEL_OPTIONS` list? (Suggested: `gemini-2.0-flash`, `gemini-2.0-flash-lite`, `gemini-1.5-pro`, `gemini-1.5-flash`.)
+- Which Gemini models should be in the initial `GEMINI_MODEL_OPTIONS` list? (Suggested: `gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-1.5-pro`, `gemini-1.5-flash`.)
 - Should the existing `model_options` in the UI prompt tab dropdown be updated automatically from `MODEL_OPTIONS`, or is there a separate hardcoded list to update?
 - If the Gemini OpenAI-compatible endpoint `usage` field differs from OpenAI, is a minor normalization shim acceptable within `_get_usage_value()`, or should it emit a warning and continue?
 - Should `run_testgemini_local.py` skip gracefully with `SKIP: GEMINI_API_KEY_NOT_SET` when the key is absent, or hard-fail?
@@ -118,7 +118,7 @@ Add Gemini as a third LLM provider by wiring `GEMINI_API_KEY` into the GUI crede
 - [ ] Run feature unit tests: `python -m pytest -q tests/test_gemini_provider.py` and record exit code and pass evidence in Testing Plan.
 - [ ] Add `webtests/run_testgemini_local.py` smoke script following the `run_testlogin_local.py` pattern; add `SKIP: GEMINI_API_KEY_NOT_SET` graceful exit when key is absent. *(TEST-SMOKE-GEMINI-001)*
 - [ ] Run `python ./precommit_smoketest.py` and record exit code and pass evidence in Testing Plan.
-- [ ] Run feature smoke test: `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flash` and record exit code, `FINAL:` token, and artifact path in Testing Plan.
+- [ ] Run feature smoke test: `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash` and record exit code, `FINAL:` token, and artifact path in Testing Plan.
 - [ ] Update `release_test.py` to include `TEST-UNIT-GEMINI-001` through `TEST-UNIT-GEMINI-004` unit coverage and `TEST-SMOKE-GEMINI-001` smoke entry.
 - [ ] Update `README.md` with `GEMINI_API_KEY` setup instructions and CLI usage example for Gemini models.
 - [ ] Update `docs/Structure.MD` Provider Routing section to reference the `"gemini"` provider case.
@@ -141,7 +141,7 @@ Add Gemini as a third LLM provider by wiring `GEMINI_API_KEY` into the GUI crede
 
 **Happy Path — CLI:**
 1. Developer sets `GEMINI_API_KEY=<key>` in the environment.
-2. Developer runs: `python vision_playwright_openai_vision_poc.py --model gemini-2.0-flash --start-url <url> --prompt "..." --success "..."`
+2. Developer runs: `python vision_playwright_openai_vision_poc.py --model gemini-2.5-flash --start-url <url> --prompt "..." --success "..."`
 3. The runtime detects provider `"gemini"`, reads `GEMINI_API_KEY`, creates the OpenAI-compatible client, and executes the agent flow as normal.
 
 ---
@@ -191,11 +191,11 @@ Add Gemini as a third LLM provider by wiring `GEMINI_API_KEY` into the GUI crede
 
 | Test ID | Type | File | Description | REQ Coverage |
 |---|---|---|---|---|
-| TEST-UNIT-GEMINI-001 | Unit | `tests/test_gemini_provider.py` | `infer_model_provider()` returns `"gemini"` for all `gemini-*` inputs; `model_api_env_var("gemini-2.0-flash")` returns `"GEMINI_API_KEY"`. | REQ-1, REQ-2 |
+| TEST-UNIT-GEMINI-001 | Unit | `tests/test_gemini_provider.py` | `infer_model_provider()` returns `"gemini"` for all `gemini-*` inputs; `model_api_env_var("gemini-2.5-flash")` returns `"GEMINI_API_KEY"`. | REQ-1, REQ-2 |
 | TEST-UNIT-GEMINI-002 | Unit | `tests/test_gemini_provider.py` | `GEMINI_MODEL_OPTIONS` contains at least one entry; all entries appear in `MODEL_OPTIONS`; no existing OpenAI or Claude entries are removed. | REQ-3 |
-| TEST-UNIT-GEMINI-003 | Unit | `tests/test_gemini_provider.py` | `_new_model_client("gemini-2.0-flash", "fake_key")` returns a `_ModelClientAdapter` with `provider == "gemini"` and the underlying client configured with `GEMINI_BASE_URL`. | REQ-7 |
+| TEST-UNIT-GEMINI-003 | Unit | `tests/test_gemini_provider.py` | `_new_model_client("gemini-2.5-flash", "fake_key")` returns a `_ModelClientAdapter` with `provider == "gemini"` and the underlying client configured with `GEMINI_BASE_URL`. | REQ-7 |
 | TEST-UNIT-GEMINI-004 | Unit | `tests/test_gemini_provider.py` | `AppState` dataclass has `gemini_key_var` attribute; `build_run_lifecycle()` raises/shows error and does NOT launch subprocess when Gemini model is selected and `gemini_key_var` is empty. | REQ-5, REQ-6 |
-| TEST-SMOKE-GEMINI-001 | Smoke | `webtests/run_testgemini_local.py` | Full e2e login run against the local test site using `--model gemini-2.0-flash`; emits exactly one `FINAL: PASS` or `FINAL: FAIL`; no API or parsing errors in log. Success criterion: `VISUAL_UNIQUE: GEMINI_PROVIDER_SMOKE_COMPLETE` — terminal log line visible only at run completion, not in intermediate agent steps. | REQ-7, REQ-8, REQ-9 |
+| TEST-SMOKE-GEMINI-001 | Smoke | `webtests/run_testgemini_local.py` | Full e2e login run against the local test site using `--model gemini-2.5-flash`; emits exactly one `FINAL: PASS` or `FINAL: FAIL`; no API or parsing errors in log. Success criterion: `VISUAL_UNIQUE: GEMINI_PROVIDER_SMOKE_COMPLETE` — terminal log line visible only at run completion, not in intermediate agent steps. | REQ-7, REQ-8, REQ-9 |
 
 ### Smoke Test Success Criteria (TEST-SMOKE-GEMINI-001)
 
@@ -217,7 +217,7 @@ python -m pytest -q tests/
 python ./precommit_smoketest.py
 
 # Feature smoke test (requires GEMINI_API_KEY in env)
-python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flash
+python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash
 ```
 
 ### Requirement-to-Test Traceability Matrix
@@ -231,9 +231,9 @@ python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flas
 | REQ-5 | TEST-UNIT-GEMINI-004 | Unit | `python -m pytest -q tests/test_gemini_provider.py` |
 | REQ-6 | TEST-UNIT-GEMINI-004 | Unit | `python -m pytest -q tests/test_gemini_provider.py` |
 | REQ-7 | TEST-UNIT-GEMINI-003 | Unit | `python -m pytest -q tests/test_gemini_provider.py` |
-| REQ-7 | TEST-SMOKE-GEMINI-001 | Smoke | `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flash` |
-| REQ-8 | TEST-SMOKE-GEMINI-001 | Smoke | `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flash` |
-| REQ-9 | TEST-SMOKE-GEMINI-001 | Smoke | `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flash` |
+| REQ-7 | TEST-SMOKE-GEMINI-001 | Smoke | `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash` |
+| REQ-8 | TEST-SMOKE-GEMINI-001 | Smoke | `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash` |
+| REQ-9 | TEST-SMOKE-GEMINI-001 | Smoke | `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash` |
 
 ### Test Execution Evidence
 
@@ -254,7 +254,7 @@ python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flas
   - Result token: `TBD` (per-run policy)
   - Log artifact: `TBD`
 
-- Command: `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flash`
+- Command: `python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash`
   - Exit code: `TBD`
   - Result token: `TBD` (`FINAL: PASS` or `FINAL: FAIL`)
   - Log artifact: `TBD`
@@ -263,10 +263,10 @@ python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flas
 
 ## Acceptance Criteria
 
-- **AC-1** (`REQ-1`, `REQ-2`, `TEST-UNIT-GEMINI-001`): `infer_model_provider("gemini-2.0-flash")` returns `"gemini"` and `model_api_env_var("gemini-2.0-flash")` returns `"GEMINI_API_KEY"`.
+- **AC-1** (`REQ-1`, `REQ-2`, `TEST-UNIT-GEMINI-001`): `infer_model_provider("gemini-2.5-flash")` returns `"gemini"` and `model_api_env_var("gemini-2.5-flash")` returns `"GEMINI_API_KEY"`.
 - **AC-2** (`REQ-3`, `TEST-UNIT-GEMINI-002`): `GEMINI_MODEL_OPTIONS` includes at least one entry and every entry appears in `MODEL_OPTIONS`; existing OpenAI and Claude entries are not removed.
 - **AC-3** (`REQ-4`, `REQ-5`, `REQ-6`, `TEST-UNIT-GEMINI-004`): GUI credentials panel displays a Gemini API Key field; selecting a `gemini-*` model and attempting a run without a key triggers the missing-key error dialog and does not launch the subprocess.
-- **AC-4** (`REQ-7`, `TEST-UNIT-GEMINI-003`): `_new_model_client("gemini-2.0-flash", key)` returns a `_ModelClientAdapter` with `provider == "gemini"` using the correct Gemini OpenAI-compatible base URL.
+- **AC-4** (`REQ-7`, `TEST-UNIT-GEMINI-003`): `_new_model_client("gemini-2.5-flash", key)` returns a `_ModelClientAdapter` with `provider == "gemini"` using the correct Gemini OpenAI-compatible base URL.
 - **AC-5** (`REQ-8`, `TEST-SMOKE-GEMINI-001`): A Gemini-powered smoke run against the local test site completes with exactly one `FINAL: PASS` and no response-parsing errors; terminal output includes `VISUAL_UNIQUE: GEMINI_PROVIDER_SMOKE_COMPLETE`.
 - **AC-6** (`REQ-9`, `TEST-SMOKE-GEMINI-001`): The CLI correctly reads `GEMINI_API_KEY` from the environment for a `gemini-*` model and completes the run without a missing-key error.
 

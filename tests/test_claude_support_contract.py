@@ -6,14 +6,14 @@ from vision_playwright_openai_vision_poc import _coerce_openai_input_to_anthropi
 
 def test_model_options_include_multiple_claude_entries() -> None:
     claude_models = [m for m in MODEL_OPTIONS if m.startswith("claude-")]
-    assert len(claude_models) >= 3
+    assert len(claude_models) >= 5
 
 
 def test_provider_and_env_mapping_for_models() -> None:
-    assert infer_model_provider("gpt-5.1") == "openai"
-    assert model_api_env_var("gpt-5.1") == "OPENAI_API_KEY"
-    assert infer_model_provider("claude-sonnet-4-5") == "anthropic"
-    assert model_api_env_var("claude-sonnet-4-5") == "ANTHROPIC_API_KEY"
+    assert infer_model_provider("gpt-5.4") == "openai"
+    assert model_api_env_var("gpt-5.4") == "OPENAI_API_KEY"
+    assert infer_model_provider("claude-opus-4-7") == "anthropic"
+    assert model_api_env_var("claude-opus-4-7") == "ANTHROPIC_API_KEY"
 
 
 def test_openai_input_is_coerced_for_anthropic_messages() -> None:

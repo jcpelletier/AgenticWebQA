@@ -173,8 +173,8 @@ Constraints:
 
 ## Typical Commands
 - `python -m pytest -q tests`
-- `python ./webtests/run_test<feature>_local.py --skip-install --model gpt-5.1`
-- `python ./webtests/run_test<feature>_local.py --skip-install --require-feature --model gpt-5.1`
+- `python ./webtests/run_test<feature>_local.py --skip-install --model gpt 5.4`
+- `python ./webtests/run_test<feature>_local.py --skip-install --require-feature --model gpt 5.4`
 
 ## Command Reference
 - Run release test suite:
@@ -183,10 +183,10 @@ Constraints:
 - Run all checks:
   - `python ./precommit_smoketest.py`
 - Run login smoke:
-  - `python ./webtests/run_testlogin_local.py --skip-install --model gpt-5.1`
+  - `python ./webtests/run_testlogin_local.py --skip-install --model gpt 5.4`
 - Run feature smoke:
-  - `python ./webtests/run_testregister_local.py --skip-install --model gpt-5.1`
+  - `python ./webtests/run_testregister_local.py --skip-install --model gpt 5.4`
 - Run feature smoke strict mode:
-  - `python ./webtests/run_testregister_local.py --skip-install --require-feature --model gpt-5.1`
+  - `python ./webtests/run_testregister_local.py --skip-install --require-feature --model gpt 5.4`
 - Run local test site:
   - `python -m http.server 8000 --directory test-site`

@@ -317,7 +317,7 @@ def create_prompt_tab(
         textvariable=model_var,
         values=MODEL_OPTIONS,
         width=27,
-        state="readonly",
+        state="normal",
     )
     model_combo.pack(side="left")
     model_row.pack(anchor="w", pady=(3, 0), fill="x")

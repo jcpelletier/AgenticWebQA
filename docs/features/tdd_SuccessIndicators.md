@@ -142,7 +142,7 @@ ASSUMPTION: QAManager and RequirementsTraceabilityReviewer subagent types were n
 - [x] Run `python -m mypy .` — **Success: no issues found in 53 source files**
 - [x] Run `python -m ruff format .` — **format passes**
 - [x] Run new feature unit tests: `python -m pytest tests/test_success_indicators.py -v` — **17 passed**
-- [x] Run integration smoke (login, migrated script): `python ./webtests/run_testlogin_local.py --skip-install --model claude-sonnet-4-6` — PASS (REQ-11, TEST-SMOKE-1). Also ran TEST-SMOKE-2/3/4 directly via CLI — all PASS with deterministic log confirmation.
+- [x] Run integration smoke (login, migrated script): `python ./webtests/run_testlogin_local.py --skip-install --model Sonnet 4.6` — PASS (REQ-11, TEST-SMOKE-1). Also ran TEST-SMOKE-2/3/4 directly via CLI — all PASS with deterministic log confirmation.
 - [x] Run `python ./precommit_smoketest.py` — **PASS** (TEST-REGRESSION-1). All checks passed in 120s.
 - [x] Update `release_test.py` coverage: no changes required. `release_test.py` already runs `pytest -q tests` as its first step, which picks up `tests/test_success_indicators.py` automatically. No new standalone webtest scripts were added for this feature.
 
@@ -163,7 +163,7 @@ python vision_playwright_openai_vision_poc.py \
   --prompt "Log in with username demo and password demo123" \
   --text-present-success "Welcome, demo" \
   --start-url http://127.0.0.1:8000/index.html \
-  --model claude-sonnet-4-6
+  --model Sonnet 4.6
 ```
 After each Playwright action, the agent checks whether "Welcome, demo" appears in the visible page text. On first step where it does, emits `FINAL: PASS` and exits.
 
@@ -173,7 +173,7 @@ python vision_playwright_openai_vision_poc.py \
   --prompt "Log in" \
   --selector-present-success "[data-testid='home-welcome']" \
   --start-url http://127.0.0.1:8000/index.html \
-  --model claude-sonnet-4-6
+  --model Sonnet 4.6
 ```
 
 ## CLI Happy Path (URL match)
@@ -182,7 +182,7 @@ python vision_playwright_openai_vision_poc.py \
   --prompt "Log in" \
   --url-match-success "/home.html" \
   --start-url http://127.0.0.1:8000/index.html \
-  --model claude-sonnet-4-6
+  --model Sonnet 4.6
 ```
 
 ## CLI Happy Path (regex URL)
@@ -349,10 +349,10 @@ _Derived from inline QAManager analysis (fallback mode — see Sub-Agent Output 
 
 | Test ID | Scenario | Run Command | Success Criteria |
 |---|---|---|---|
-| TEST-SMOKE-1 | Login with `--visual-llm-success` (migrated script) | `python ./webtests/run_testlogin_local.py --skip-install --model claude-sonnet-4-6` | `VISUAL_UNIQUE: FINAL: PASS` appears in terminal output; no fallback to vision |
-| TEST-SMOKE-2 | Login with `--text-present-success "Welcome, demo"` | `python vision_playwright_openai_vision_poc.py --prompt "Log in with demo/demo123" --text-present-success "Welcome, demo" --start-url http://127.0.0.1:8000/index.html --model claude-sonnet-4-6 --headless` | `VISUAL_UNIQUE: FINAL: PASS` in terminal; no LLM verify call in log |
-| TEST-SMOKE-3 | Login with `--selector-present-success "[data-testid='home-welcome']"` | `python vision_playwright_openai_vision_poc.py --prompt "Log in with demo/demo123" --selector-present-success "[data-testid='home-welcome']" --start-url http://127.0.0.1:8000/index.html --model claude-sonnet-4-6 --headless` | `VISUAL_UNIQUE: FINAL: PASS` in terminal |
-| TEST-SMOKE-4 | Login with `--url-match-success "home.html"` | `python vision_playwright_openai_vision_poc.py --prompt "Log in with demo/demo123" --url-match-success "home.html" --start-url http://127.0.0.1:8000/index.html --model claude-sonnet-4-6 --headless` | `VISUAL_UNIQUE: FINAL: PASS` in terminal |
+| TEST-SMOKE-1 | Login with `--visual-llm-success` (migrated script) | `python ./webtests/run_testlogin_local.py --skip-install --model Sonnet 4.6` | `VISUAL_UNIQUE: FINAL: PASS` appears in terminal output; no fallback to vision |
+| TEST-SMOKE-2 | Login with `--text-present-success "Welcome, demo"` | `python vision_playwright_openai_vision_poc.py --prompt "Log in with demo/demo123" --text-present-success "Welcome, demo" --start-url http://127.0.0.1:8000/index.html --model Sonnet 4.6 --headless` | `VISUAL_UNIQUE: FINAL: PASS` in terminal; no LLM verify call in log |
+| TEST-SMOKE-3 | Login with `--selector-present-success "[data-testid='home-welcome']"` | `python vision_playwright_openai_vision_poc.py --prompt "Log in with demo/demo123" --selector-present-success "[data-testid='home-welcome']" --start-url http://127.0.0.1:8000/index.html --model Sonnet 4.6 --headless` | `VISUAL_UNIQUE: FINAL: PASS` in terminal |
+| TEST-SMOKE-4 | Login with `--url-match-success "home.html"` | `python vision_playwright_openai_vision_poc.py --prompt "Log in with demo/demo123" --url-match-success "home.html" --start-url http://127.0.0.1:8000/index.html --model Sonnet 4.6 --headless` | `VISUAL_UNIQUE: FINAL: PASS` in terminal |
 | TEST-REGRESSION-1 | Full existing webtest suite | `python ./precommit_smoketest.py` | All previously passing tests continue to pass |
 
 ## Test Execution Evidence (to be filled in during implementation)
@@ -362,7 +362,7 @@ _Derived from inline QAManager analysis (fallback mode — see Sub-Agent Output 
 | TEST-UNIT-* (17 tests) | `python -m pytest tests/test_success_indicators.py tests/test_cli_entry.py -v` | PASS (32 passed) | 2026-04-10 |
 | Full suite (105 tests) | `python -m pytest tests/ -q` | PASS (105 passed) | 2026-04-10 |
 | mypy | `python -m mypy .` | PASS (no issues in 53 files) | 2026-04-10 |
-| TEST-SMOKE-1 | `python ./webtests/run_testlogin_local.py --skip-install --model claude-sonnet-4-6` | PASS | 2026-04-11 |
+| TEST-SMOKE-1 | `python ./webtests/run_testlogin_local.py --skip-install --model Sonnet 4.6` | PASS | 2026-04-11 |
 | TEST-SMOKE-2 | `python vision_playwright_openai_vision_poc.py ... --text-present-success "Welcome, demo" --actions login_demo ...` | PASS (`[deterministic] text_present matched`) | 2026-04-11 |
 | TEST-SMOKE-3 | `python vision_playwright_openai_vision_poc.py ... --selector-present-success "[data-testid='home-welcome']" ...` | PASS | 2026-04-11 |
 | TEST-SMOKE-4 | `python vision_playwright_openai_vision_poc.py ... --url-match-success "home.html" ...` | PASS (`[deterministic] url_match matched`) | 2026-04-11 |

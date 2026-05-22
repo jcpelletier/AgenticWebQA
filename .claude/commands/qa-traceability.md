@@ -66,5 +66,5 @@ Return findings using the QA_Traceability output contract sections.
 ## Typical Commands
 - `python -m pytest -q tests`
 - `python -m pytest -q tests/test_<feature>*.py`
-- `python .\webtests\run_test<feature>_local.py --skip-install --model gpt-5.1`
-- `python .\webtests\run_test<feature>_local.py --skip-install --require-feature --model gpt-5.1`
+- `python .\webtests\run_test<feature>_local.py --skip-install --model gpt 5.4`
+- `python .\webtests\run_test<feature>_local.py --skip-install --require-feature --model gpt 5.4`

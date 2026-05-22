@@ -323,7 +323,7 @@ def main() -> int:
         "--model",
         metavar="MODEL",
         default=None,
-        help="Override the model for all tests (e.g. claude-opus-4-6).",
+        help="Override the model for all tests (e.g. Opus 4.6).",
     )
     parser.add_argument(
         "--no-wipe",

@@ -81,7 +81,7 @@ The intended workflow is two-phase:
 1. LLM training runs (headed, best model).
    - Run prompts in primarily LLM mode to explore the site and learn reliable DOM hints.
    - This builds the site actions library automatically (`site_hints.json` and `Models/*.json`).
-   - Use the best available model here. Recommendation: `claude-sonnet-4-6`.
+   - Use the best available model here. Recommendation: `Sonnet 4.6`.
 2. Test execution runs (Playwright-first).
    - Re-run prompts and tests with the learned library in place.
    - Playwright handles stable steps, while the LLM can adapt to small UI changes without failing the current run.
@@ -357,21 +357,21 @@ How to diagnose which path ran:
 - DOM actions return `dom: true` and include `dom_hint` in tool results.
 - Vision fallback results include coordinates.
 
-## UI Model Selection (Dropdown)
+## UI Model Selection (Suggestions)
 
-In the UI (`vision_playwright_openai_vision_ui.py`), the Model dropdown includes models from all three supported providers:
+In the UI (`vision_playwright_openai_vision_ui.py`), the Model selector allows free-form text input and provides suggestions from all three supported providers:
 
-**OpenAI** — `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.4-nano`, `gpt-5.2`, `gpt-5.1`, `gpt-5`, `gpt-5-mini`, `gpt-5-nano`
+**OpenAI** — `gpt 5.5`, `gpt 5.4`, `gpt 5.4mini`, `gpt-5.4-nano`
 
-**Anthropic** — `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-haiku-4-5`, `claude-sonnet-4-5`, `claude-opus-4-5`, `claude-opus-4-1`, `claude-sonnet-4-0`
+**Anthropic** — `Opus 4.7`, `Opus 4.6`, `Sonnet 4.6`, `Sonnet 4.5`, `Haiku 4.5`
 
-**Google Gemini** — `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`
+**Google Gemini** — `gemini-3.5-flash`, `gemini-3.1-flash-lite`, `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`
 
 Recommendation:
-- Use a model like `claude-sonnet-4-6` for LLM training runs and difficult sites.
-- Use a small model like `gemini-2.5-flash` or 'Haiku 4.5' for cost-effective runs.
+- Use a model like `Opus 4.7` for LLM training runs and difficult sites.
+- Use a small model like `gemini-3.5-flash` or `Haiku 4.5` for cost-effective runs.
 
-The dropdown value maps directly to the CLI `--model` flag; the provider is inferred from the model name prefix.
+The model value maps directly to the CLI `--model` flag; the provider is inferred from the model name. You can also type any arbitrary model name that is not in the suggestions list.
 
 ## Manual Click Interjection (Headed Mode)
 
