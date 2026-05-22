@@ -367,9 +367,11 @@ In the UI (`vision_playwright_openai_vision_ui.py`), the Model dropdown includes
 
 **Google Gemini** — `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`
 
+**DeepSeek** — `deepseek-v4-flash`, `deepseek-v4-pro`
+
 Recommendation:
 - Use a model like `claude-sonnet-4-6` for LLM training runs and difficult sites.
-- Use a small model like `gemini-2.5-flash` or 'Haiku 4.5' for cost-effective runs.
+- Use a small model like `gemini-2.5-flash` or `claude-haiku-4-5` for cost-effective runs.
 
 The dropdown value maps directly to the CLI `--model` flag; the provider is inferred from the model name prefix.
 
