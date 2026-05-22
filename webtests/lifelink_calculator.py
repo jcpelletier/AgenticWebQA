@@ -29,14 +29,14 @@ TEST_CASES = [
         "Select Calendar input field at the top of the screen.",
         "The Calendar input field at the top of the screen is in focus.",
         "select_calendar",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_01_Select",
         "Select the 'Open Negotiation Initiation Window' radio option.",
         "The 'Open Negotiation Initiation Window' radio option is selected.",
         "radial_01_select",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_01_Dates",
@@ -47,14 +47,14 @@ TEST_CASES = [
             "Both dates are visible on the page."
         ),
         "radial_01_select,select_calendar,radial_01_dates",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_02_Select",
         "Select the 'Open negotiation period' radio option.",
         "The 'Open negotiation period' radio option is selected.",
         "radial_02_select",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_02_Dates",
@@ -65,14 +65,14 @@ TEST_CASES = [
             "Both dates are visible on the page."
         ),
         "radial_02_select,select_calendar,radial_02_dates",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_03_Select",
         "Select the 'IDR initiation window' radio option.",
         "The 'IDR initiation window' radio option is selected.",
         "radial_03_select",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_03_Dates",
@@ -83,14 +83,14 @@ TEST_CASES = [
             "+ federal holidays + 4 business days). Both dates are visible on the page."
         ),
         "radial_03_select,select_calendar,radial_03_dates",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_04_Select",
         "Select the 'IDRE selection window' radio option.",
         "The 'IDRE selection window' radio option is selected.",
         "radial_04_select",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_04_Dates",
@@ -104,14 +104,14 @@ TEST_CASES = [
             "Both dates are visible weekdays."
         ),
         "radial_04_select,select_calendar,radial_04_dates",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_05_Select",
         "Select the 'IDR offer submission window' radio option.",
         "The 'IDR offer submission window' radio option is selected.",
         "radial_05_select",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_05_Dates",
@@ -126,14 +126,14 @@ TEST_CASES = [
             "Both dates are visible weekdays."
         ),
         "radial_05_select,select_calendar,radial_05_dates",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_06_Select",
         "Select the 'Written determination due date' radio option.",
         "The 'Written determination due date' radio option is selected.",
         "radial_06_select",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_06_Dates",
@@ -144,14 +144,14 @@ TEST_CASES = [
         ),
         "Written Determination Due Date is listed as 5/27/2026",
         "radial_06_select,select_calendar,radial_06_dates",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_07_Select",
         "Select the 'Payor payment due date' radio option.",
         "The 'Payor payment due date' radio option is selected.",
         "radial_07_select",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_07_Dates",
@@ -162,14 +162,14 @@ TEST_CASES = [
         ),
         "The displayed Payor Payment Due Date is 6/26/2026.",
         "radial_07_select,select_calendar,radial_07_dates",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_08_Select",
         "Select the 'Cooling-off period' radio option.",
         "The 'Cooling-off period' radio option is selected.",
         "radial_08_select",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_08_Dates",
@@ -184,14 +184,14 @@ TEST_CASES = [
             "Both dates are visible."
         ),
         "radial_08_select,select_calendar,radial_08_dates",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_09_Select",
         "Select the 'Post-cooling-off-period IDR initiation window' radio option.",
         "The 'Post-cooling-off-period IDR initiation window' radio option is selected.",
         "radial_09_select",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "Radial_09_Dates",
@@ -202,7 +202,7 @@ TEST_CASES = [
         ),
         "The Post-Cooling-Off-Period IDR Initiation Window is shown. The listed date range is 8/26/2026 to 10/7/2026.",
         "radial_09_select,select_calendar,radial_09_dates",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
 ]
 
@@ -323,7 +323,7 @@ def main() -> int:
         "--model",
         metavar="MODEL",
         default=None,
-        help="Override the model for all tests (e.g. claude-opus-4-6).",
+        help="Override the model for all tests (e.g. Opus 4.6).",
     )
     parser.add_argument(
         "--no-wipe",

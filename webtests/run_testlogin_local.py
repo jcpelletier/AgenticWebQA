@@ -17,7 +17,7 @@ PROMPT = (
 )
 SUCCESS = "You are on the Home page and see 'Welcome, demo'."
 START_URL = "http://127.0.0.1:8000/index.html"
-DEFAULT_MODEL = "claude-opus-4-6"
+DEFAULT_MODEL = "Opus 4.6"
 
 
 def run(cmd: list[str], cwd: Path, tee_path: Path | None = None) -> None:

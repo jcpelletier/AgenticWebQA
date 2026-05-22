@@ -39,7 +39,7 @@ TEST_CASES = [
         ),
         "The user is logged in.",
         "login",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "SearchForMovie",
@@ -50,7 +50,7 @@ TEST_CASES = [
         ),
         "A poster image for 'Matilda' appears",
         "login, search_movie",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "OpenMovieDetails",
@@ -61,7 +61,7 @@ TEST_CASES = [
         ),
         "The Movie Details screen for 'Chicago' is visible.",
         "login, search_movie, open_moviedetails",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
     (
         "CheckForSubs",
@@ -72,7 +72,7 @@ TEST_CASES = [
         ),
         "The Movie 'Annie' has subtitles available.",
         "login, search_movie, open_moviedetails",
-        "claude-sonnet-4-6",
+        "Sonnet 4.6",
     ),
 ]
 
@@ -193,7 +193,7 @@ def main() -> int:
         "--model",
         metavar="MODEL",
         default=None,
-        help="Override the model for all tests (e.g. claude-opus-4-6).",
+        help="Override the model for all tests (e.g. Opus 4.6).",
     )
     parser.add_argument(
         "--username",

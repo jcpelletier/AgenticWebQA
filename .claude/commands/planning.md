@@ -58,7 +58,7 @@ Planner output must:
 - Require each visual smoke success criterion in `Testing Plan` to include `VISUAL_UNIQUE:` terminal marker text that is not visible in earlier prompt steps.
 - Require explicit test execution evidence in the TDD showing which unit and integration/smoke commands were run and passed.
 - Require all newly introduced unit/integration tests to be explicitly documented in the TDD Testing Plan (test IDs, scenario intent, and run command).
-- Use portable Python command paths in testing instructions (for example `python ./webtests/run_test<feature>_local.py --skip-install --model gpt-5.1`).
+- Use portable Python command paths in testing instructions (for example `python ./webtests/run_test<feature>_local.py --skip-install --model gpt 5.4`).
 - Avoid implementation code in planning output.
 
 Example:
@@ -197,7 +197,7 @@ For visual smoke tests, require `VISUAL_UNIQUE:` in success criteria and ensure 
 If answers are unavailable, continue with explicit ASSUMPTION markers and capture blockers in Open Questions.
 Default to no `precommit_smoketest.py` changes unless explicitly requested by a developer.
 Require checklist items to separately run `python ./precommit_smoketest.py`, feature unit tests, and feature integration/smoke tests, and to record which test commands passed in the TDD.
-Require generated feature integration/smoke command examples to include `--model <ai-model>` (default `gpt-5.1`) unless a different model is explicitly requested.
+Require generated feature integration/smoke command examples to include `--model <ai-model>` (default `gpt 5.4`) unless a different model is explicitly requested.
 Require a checklist step to update `release_test.py` whenever new automated unit/e2e coverage is introduced.
 Require the Testing Plan to list any new unit/integration tests added for the feature with test IDs, intent, and command.
 Require Sub-Agent Output Verification to confirm required QAManager-style fields for each subagent response.

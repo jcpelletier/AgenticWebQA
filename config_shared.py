@@ -13,27 +13,23 @@ from typing import Any, Dict, List, Literal, Optional, Sequence
 
 
 # Model defaults/options
-DEFAULT_MODEL = "gpt-5.4"
+DEFAULT_MODEL = "gpt 5.4"
 OPENAI_MODEL_OPTIONS = [
-    "gpt-5.4",
-    "gpt-5.4-mini",
+    "gpt 5.5",
+    "gpt 5.4",
+    "gpt 5.4mini",
     "gpt-5.4-nano",
-    "gpt-5.2",
-    "gpt-5.1",
-    "gpt-5",
-    "gpt-5-mini",
-    "gpt-5-nano",
 ]
 CLAUDE_MODEL_OPTIONS = [
-    "claude-opus-4-6",
-    "claude-sonnet-4-6",
-    "claude-haiku-4-5",
-    "claude-sonnet-4-5",
-    "claude-opus-4-5",
-    "claude-opus-4-1",
-    "claude-sonnet-4-0",
+    "Opus 4.7",
+    "Opus 4.6",
+    "Sonnet 4.6",
+    "Sonnet 4.5",
+    "Haiku 4.5",
 ]
 GEMINI_MODEL_OPTIONS = [
+    "gemini-3.5-flash",
+    "gemini-3.1-flash-lite",
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
@@ -404,7 +400,13 @@ SHARED_ARG_SPECS: Sequence[SharedArgSpec] = (
 
 def infer_model_provider(model_name: str) -> Literal["openai", "anthropic", "gemini"]:
     model = (model_name or "").strip().lower()
-    if model.startswith("claude") or model.startswith("anthropic."):
+    if (
+        model.startswith("claude")
+        or model.startswith("anthropic.")
+        or "opus" in model
+        or "sonnet" in model
+        or "haiku" in model
+    ):
         return "anthropic"
     if model.startswith("gemini"):
         return "gemini"

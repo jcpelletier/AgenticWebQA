@@ -22,7 +22,7 @@ from pathlib import Path
 
 START_URL = "http://127.0.0.1:8000/index.html"
 LOG_NAME = "profilemydetails_run.log"
-DEFAULT_MODEL = "claude-sonnet-4-6"
+DEFAULT_MODEL = "Sonnet 4.6"
 
 
 def run(cmd: list[str], cwd: Path, tee_path: Path | None = None) -> None:

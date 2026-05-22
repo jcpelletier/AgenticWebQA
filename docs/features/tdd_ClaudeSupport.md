@@ -55,7 +55,7 @@ Introduce Claude API support as an additional selectable model provider so devel
 
 ## Open Questions
 - Should provider be explicitly selectable in UI/CLI (for example `--provider anthropic|openai`) instead of inferring provider from model name?
-- Which Claude model versions are required for MVP availability in dropdown (for example `claude-sonnet-4-5`, `claude-opus-4-1`, `claude-haiku-4-5`), and should this list be centrally version-pinned?
+- Which Claude model versions are required for MVP availability in dropdown (for example `Sonnet 4.5`, `Opus 4.1`, `Haiku 4.5`), and should this list be centrally version-pinned?
 - Should Claude-specific run telemetry (token usage/cost fields) be normalized to match existing OpenAI logging output format?
 
 ## Linear Checklist

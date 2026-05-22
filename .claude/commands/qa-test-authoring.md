@@ -25,7 +25,7 @@ START_URL = "http://127.0.0.1:8000/index.html"
 SITE_HINTS_KEY = "127.0.0.1"
 SITE_MODEL_FILE = "http_127_0_0_1_8000_index_html.json"
 LOG_NAME = "myfeature_run.log"
-DEFAULT_MODEL = "claude-sonnet-4-6"
+DEFAULT_MODEL = "Sonnet 4.6"
 FALLBACK_PATTERN = "[playwright] Falling back to LLM."
 ```
 
@@ -77,8 +77,8 @@ test to pass. Written as an observation.
 unit. Reuse existing actions as prefixes rather than creating new ones
 (e.g. `register_account,profile_open,my_new_action`, not `my_new_login`).
 
-**Model** — `claude-sonnet-4-6` unless the task needs extra reasoning
-(`claude-opus-4-6`) or is simple enough to be cheap (`claude-haiku-4-5`).
+**Model** — `Sonnet 4.6` unless the task needs extra reasoning
+(`Opus 4.6`) or is simple enough to be cheap (`Haiku 4.5`).
 
 ### Step 2 — Create the script
 

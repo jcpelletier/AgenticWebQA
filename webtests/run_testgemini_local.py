@@ -5,7 +5,7 @@ Smoke test: Gemini provider — login flow against the local test site.
 Validates REQ-7, REQ-8, REQ-9 (GeminiProviderSupport TDD).
 
 Usage:
-    python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.0-flash
+    python ./webtests/run_testgemini_local.py --skip-install --model gemini-2.5-flash
 
 Exits with code 0 on success, non-zero on failure.
 Skips gracefully with SKIP: GEMINI_API_KEY_NOT_SET when the key is absent.
