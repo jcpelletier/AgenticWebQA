@@ -24,7 +24,7 @@ from pathlib import Path
 DEFAULT_CALC_URL = "https://lifelink-calculator.vercel.app"
 # ────────────────────────────────────────────────────────────────────────────
 
-DEFAULT_MODEL = "Sonnet 4.6"
+DEFAULT_MODEL = "claude-sonnet-4-6"
 
 # ── Test definitions ─────────────────────────────────────────────────────────
 # Each entry: (test_id, title, action, prompt, success_criteria)

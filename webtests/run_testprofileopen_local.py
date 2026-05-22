@@ -11,7 +11,7 @@ from pathlib import Path
 
 START_URL = "http://127.0.0.1:8000/index.html"
 PROFILE_OPEN_LOG = "profileopen_run.log"
-DEFAULT_MODEL = "Sonnet 4.6"
+DEFAULT_MODEL = "claude-sonnet-4-6"
 
 PROMPT = "1. Register an account\n2. Open Profile from the header."
 SUCCESS = "The user is on the profile page."

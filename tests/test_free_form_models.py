@@ -15,10 +15,10 @@ def test_free_form_model_inference():
 
 def test_new_anthropic_keyword_inference():
     # Test that the new keywords also trigger anthropic provider
-    assert infer_model_provider("Opus 4.8") == "anthropic"
-    assert infer_model_provider("Sonnet 4.7") == "anthropic"
-    assert infer_model_provider("Haiku 4.6") == "anthropic"
+    assert infer_model_provider("claude-opus-4-8") == "anthropic"
+    assert infer_model_provider("claude-sonnet-4-7") == "anthropic"
+    assert infer_model_provider("claude-haiku-4-6") == "anthropic"
 
-    assert model_api_env_var("Opus 4.8") == "ANTHROPIC_API_KEY"
-    assert model_api_env_var("Sonnet 4.7") == "ANTHROPIC_API_KEY"
-    assert model_api_env_var("Haiku 4.6") == "ANTHROPIC_API_KEY"
+    assert model_api_env_var("claude-opus-4-8") == "ANTHROPIC_API_KEY"
+    assert model_api_env_var("claude-sonnet-4-7") == "ANTHROPIC_API_KEY"
+    assert model_api_env_var("claude-haiku-4-6") == "ANTHROPIC_API_KEY"

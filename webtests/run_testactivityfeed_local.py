@@ -24,7 +24,7 @@ START_URL = "http://127.0.0.1:8000/index.html"
 SITE_HINTS_KEY = "127.0.0.1"
 SITE_MODEL_FILE = "http_127_0_0_1_8000_index_html.json"
 LOG_NAME = "activityfeed_run.log"
-DEFAULT_MODEL = "Sonnet 4.6"
+DEFAULT_MODEL = "claude-sonnet-4-6"
 
 FALLBACK_PATTERN = "[playwright] Falling back to LLM."
 

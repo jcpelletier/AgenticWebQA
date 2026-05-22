@@ -19,7 +19,7 @@ PROMPT = (
 SUCCESS = "The user is on the sign in page after logging out."
 START_URL = "http://127.0.0.1:8000/index.html"
 LOGOUT_LOG = "logout_run.log"
-DEFAULT_MODEL = "Haiku 4.5"
+DEFAULT_MODEL = "claude-haiku-4-5"
 
 
 def run(cmd: list[str], cwd: Path, tee_path: Path | None = None) -> None:

@@ -32,8 +32,8 @@ def test_infer_model_provider_gemini_prefix_variants() -> None:
 
 
 def test_infer_model_provider_non_gemini_unchanged() -> None:
-    assert infer_model_provider("gpt 5.4") == "openai"
-    assert infer_model_provider("Sonnet 4.6") == "anthropic"
+    assert infer_model_provider("gpt-5.4") == "openai"
+    assert infer_model_provider("claude-sonnet-4-6") == "anthropic"
 
 
 def test_model_api_env_var_returns_gemini_key_for_gemini() -> None:
@@ -42,8 +42,8 @@ def test_model_api_env_var_returns_gemini_key_for_gemini() -> None:
 
 
 def test_model_api_env_var_non_gemini_unchanged() -> None:
-    assert model_api_env_var("gpt 5.4") == "OPENAI_API_KEY"
-    assert model_api_env_var("Sonnet 4.6") == "ANTHROPIC_API_KEY"
+    assert model_api_env_var("gpt-5.4") == "OPENAI_API_KEY"
+    assert model_api_env_var("claude-sonnet-4-6") == "ANTHROPIC_API_KEY"
 
 
 # ---------------------------------------------------------------------------
@@ -66,12 +66,10 @@ def test_gemini_model_options_present_in_model_options() -> None:
 
 
 def test_model_options_preserves_openai_and_claude_entries() -> None:
-    openai_models = [m for m in MODEL_OPTIONS if m.startswith("gpt")]
-    anthropic_models = [
-        m for m in MODEL_OPTIONS if any(x in m for x in ["Opus", "Sonnet", "Haiku"])
-    ]
+    openai_models = [m for m in MODEL_OPTIONS if m.startswith("gpt-")]
+    claude_models = [m for m in MODEL_OPTIONS if m.startswith("claude-")]
     assert len(openai_models) >= 4, "OpenAI models missing from MODEL_OPTIONS"
-    assert len(anthropic_models) >= 5, "Claude models missing from MODEL_OPTIONS"
+    assert len(claude_models) >= 5, "Claude models missing from MODEL_OPTIONS"
 
 
 # ---------------------------------------------------------------------------
@@ -122,8 +120,8 @@ def test_new_model_client_non_gemini_unchanged() -> None:
         patch.object(poc, "_new_openai_client", return_value=fake_openai),
         patch.object(poc, "_new_anthropic_client", return_value=fake_anthropic),
     ):
-        openai_adapter = poc._new_model_client("gpt 5.4", "key")
-        anthropic_adapter = poc._new_model_client("Sonnet 4.6", "key")
+        openai_adapter = poc._new_model_client("gpt-5.4", "key")
+        anthropic_adapter = poc._new_model_client("claude-sonnet-4-6", "key")
 
     assert openai_adapter.provider == "openai"
     assert anthropic_adapter.provider == "anthropic"

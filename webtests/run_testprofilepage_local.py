@@ -13,7 +13,7 @@ from playwright.sync_api import sync_playwright
 
 START_URL = "http://127.0.0.1:8000/index.html"
 PROFILE_LOG = "profilepage_run.log"
-DEFAULT_MODEL = "Sonnet 4.6"
+DEFAULT_MODEL = "claude-sonnet-4-6"
 
 
 def run(cmd: list[str], cwd: Path, tee_path: Path | None = None) -> None:
