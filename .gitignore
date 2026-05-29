@@ -3,6 +3,7 @@
 /dist/
 /build/
 *.egg-info/
+coverage_report_*.txt
 # Models/ is intentionally tracked — learned Playwright actions are source artifacts.
 # Commit them alongside tests_registry.json so CI can replay without re-learning.
 site_hints.json

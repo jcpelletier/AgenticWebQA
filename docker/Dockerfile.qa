@@ -1,0 +1,19 @@
+# AgenticWebQA — clean QA runner image built from repo source.
+# This image is intentionally separate from your dev environment so
+# no editable installs, stale models, or local artifacts bleed in.
+
+FROM python:3.11-slim
+
+# Install agenticwebqa + mcp from local source
+WORKDIR /build
+COPY pyproject.toml README.md ./
+COPY src/ src/
+RUN pip install --no-cache-dir ".[mcp]"
+
+# Install Playwright Chromium (headless)
+RUN python -m playwright install --with-deps chromium
+
+# Copy helper scripts
+COPY docker/run_test.py /usr/local/bin/run_test.py
+
+WORKDIR /workspace

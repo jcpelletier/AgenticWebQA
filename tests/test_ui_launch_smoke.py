@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import vision_playwright_openai_vision_ui as ui
+import agenticwebqa.gui as ui
 
 
 def test_build_command_and_launch(monkeypatch, tmp_path) -> None:

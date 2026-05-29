@@ -1,13 +1,11 @@
 import ast
 from pathlib import Path
 
-from config_shared import SHARED_ARG_SPECS
+from agenticwebqa.config import SHARED_ARG_SPECS
 
 
 def _extract_ui_settings_keys_from_ui_file() -> set[str]:
-    ui_path = (
-        Path(__file__).resolve().parents[1] / "vision_playwright_openai_vision_ui.py"
-    )
+    ui_path = Path(__file__).resolve().parents[1] / "src" / "agenticwebqa" / "gui.py"
     source = ui_path.read_text(encoding="utf-8")
     module = ast.parse(source, filename=str(ui_path))
 
@@ -38,15 +36,11 @@ def _extract_ui_settings_keys_from_ui_file() -> set[str]:
             keys.add(elt.value)
         return keys
 
-    raise AssertionError(
-        "UI_SETTINGS_KEYS constant not found in vision_playwright_openai_vision_ui.py."
-    )
+    raise AssertionError("UI_SETTINGS_KEYS constant not found in agenticwebqa.gui.py.")
 
 
 def _extract_outside_vars_map_keys_from_ui_file() -> set[str]:
-    ui_path = (
-        Path(__file__).resolve().parents[1] / "vision_playwright_openai_vision_ui.py"
-    )
+    ui_path = Path(__file__).resolve().parents[1] / "src" / "agenticwebqa" / "gui.py"
     source = ui_path.read_text(encoding="utf-8")
     module = ast.parse(source, filename=str(ui_path))
 

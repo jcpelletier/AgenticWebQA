@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-vision_playwright_openai_vision_poc.py
+the AgenticWebQA engine
 
 Vision-only browser automation using:
 - Playwright (Chromium) for real browser rendering/control
@@ -55,8 +55,8 @@ from typing import (
 
 import openai
 from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext, Locator
-from cli_entry import parse_cli_args
-from config_shared import (
+from agenticwebqa.cli import parse_cli_args
+from agenticwebqa.config import (
     DEFAULT_MAX_SUBACTIONS_PER_FUNCTION,
     DEFAULT_MODEL,
     DEFAULT_X_SIZE_PX,

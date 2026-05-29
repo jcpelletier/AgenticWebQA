@@ -1,0 +1,47 @@
+services:
+
+  # Serves the static test-site app inside the Docker network.
+  test-site:
+    image: python:3.11-slim
+    command: python -m http.server 8000 --directory /app
+    volumes:
+      - ./test-site:/app:ro
+    ports:
+      - "8001:8000"   # exposed on 8001 so it doesn't clash with a local dev server on 8000
+    networks:
+      - qa
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  # AgenticWebQA runner — built from local source, completely isolated from
+  # the editable install in your dev environment.
+  qa:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.qa
+    volumes:
+      - ./tests_registry.json:/workspace/tests_registry.json:ro
+      - ./Models:/workspace/Models    # bind-mounted so models are tracked in git
+      - qa-output:/workspace/output   # logs + screenshots land here across runs
+    working_dir: /workspace
+    environment:
+      - OPENAI_API_KEY
+      - ANTHROPIC_API_KEY
+      - GEMINI_API_KEY
+      - WEBQA_USERNAME=${WEBQA_USERNAME:-}
+      - WEBQA_PASSWORD=${WEBQA_PASSWORD:-}
+      - TEST_SITE_URL=http://test-site:8000
+    depends_on:
+      test-site:
+        condition: service_healthy
+    networks:
+      - qa
+
+networks:
+  qa:
+
+volumes:
+  qa-output:

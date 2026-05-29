@@ -3,8 +3,8 @@ import sys
 
 import pytest
 
-from cli_entry import build_parser, parse_cli_args, prepare_args
-from config_shared import SuccessIndicatorType
+from agenticwebqa.cli import build_parser, parse_cli_args, prepare_args
+from agenticwebqa.config import SuccessIndicatorType
 
 
 def test_build_parser_accepts_visual_llm_success() -> None:

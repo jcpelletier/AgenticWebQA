@@ -1,0 +1,15 @@
+{
+  "name": "agenticwebqa",
+  "owner": {
+    "name": "Joel Pelletier",
+    "email": "joel@jpelletier.com"
+  },
+  "description": "AgenticWebQA — self-healing, LLM-driven web QA tooling for Claude Code.",
+  "plugins": [
+    {
+      "name": "agentic-web-qa",
+      "source": "./plugins/agentic-web-qa",
+      "description": "Author and run resilient browser tests: an LLM learns Playwright actions, reuses them, and heals when selectors change."
+    }
+  ]
+}

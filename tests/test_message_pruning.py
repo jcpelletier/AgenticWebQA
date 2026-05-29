@@ -1,6 +1,6 @@
 from typing import Any
 
-from vision_playwright_openai_vision_poc import prune_messages_for_cost
+from agenticwebqa.engine import prune_messages_for_cost
 
 
 def _tool_result_image(tool_use_id: str, image_id: str) -> dict:

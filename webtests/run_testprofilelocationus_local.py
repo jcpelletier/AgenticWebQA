@@ -107,11 +107,11 @@ def profile_location_us_flow_success() -> str:
 def run_profile_location_us_integration(
     repo_root: Path, *, model: str, log_path: Path
 ) -> None:
-    script = repo_root / "vision_playwright_openai_vision_poc.py"
     cmd = [
         sys.executable,
         "-u",
-        str(script),
+        "-m",
+        "agenticwebqa",
         "--prompt",
         profile_location_us_flow_prompt(),
         "--visual-llm-success",
@@ -160,8 +160,8 @@ def main() -> int:
                 "-m",
                 "pip",
                 "install",
-                "-r",
-                str(repo_root / "requirements.txt"),
+                "-e",
+                str(repo_root),
             ],
             cwd=repo_root,
         )

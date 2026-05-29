@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from vision_playwright_openai_vision_poc import (
+from agenticwebqa.engine import (
     extract_final_verdict,
     extract_final_verdict_from_text,
 )

@@ -95,11 +95,11 @@ def register_flow_success(username: str) -> str:
 def run_register_integration(
     repo_root: Path, *, username: str, password: str, model: str, log_path: Path
 ) -> None:
-    script = repo_root / "vision_playwright_openai_vision_poc.py"
     cmd = [
         sys.executable,
         "-u",
-        str(script),
+        "-m",
+        "agenticwebqa",
         "--prompt",
         register_flow_prompt(username, password),
         "--visual-llm-success",
@@ -148,8 +148,8 @@ def main() -> int:
                 "-m",
                 "pip",
                 "install",
-                "-r",
-                str(repo_root / "requirements.txt"),
+                "-e",
+                str(repo_root),
             ],
             cwd=repo_root,
         )

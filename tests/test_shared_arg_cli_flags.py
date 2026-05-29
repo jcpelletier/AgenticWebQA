@@ -1,6 +1,6 @@
 import argparse
 
-from config_shared import SHARED_ARG_SPECS, add_shared_cli_arguments
+from agenticwebqa.config import SHARED_ARG_SPECS, add_shared_cli_arguments
 
 
 def test_cli_parser_flags_match_shared_arg_specs() -> None:

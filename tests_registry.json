@@ -28,8 +28,8 @@
     "model": "Sonnet 4.6"
   },
   "profile_about_edit": {
-    "prompt": "1. Register an account\n2. Open Profile from the header.\n3. Enter About me text: {rand_string}\n4. Click Save.\n5. Reload the page.",
-    "success_criteria": "You are on the Profile page, and the About me value {rand_string} is present.",
+    "prompt": "1. Register an account\n2. Open Profile from the header.\n3. Enter About me text: {rand_string}\n4. Click Save.\n5. Click Home in the header navigation.\n6. Click Profile in the header navigation.",
+    "success_criteria": "The Profile page shows '{rand_string}' in the About me field.",
     "start_url": "http://127.0.0.1:8000/index.html",
     "actions": "register_account,profile_open,profile_aboutedit",
     "model": "Sonnet 4.6"
@@ -61,5 +61,54 @@
     "start_url": "http://127.0.0.1:8000/index.html",
     "actions": "register_account,profile_open,profile_displayname",
     "model": "Sonnet 4.6"
+  },
+  "login_invalid_credentials": {
+    "prompt": "On the login page, enter username 'wrong_user' and password 'wrongpass99', then click the Log in button.",
+    "success_criteria": "Invalid credentials.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "login_invalid_credentials",
+    "model": "gpt-4o-mini",
+    "success_type": "text"
+  },
+  "unauthenticated_redirect": {
+    "prompt": "Open the home page without logging in first. Observe what happens — the app should automatically redirect you. Do not take any navigation actions yourself.",
+    "success_criteria": "index.html",
+    "start_url": "http://127.0.0.1:8000/home.html",
+    "actions": "",
+    "model": "gpt-4o-mini",
+    "success_type": "url"
+  },
+  "activity_feed_lifecycle": {
+    "prompt": "1. Log in with username 'demo' and password 'demo123'.\n2. In the Activity Feed section on the home page, type 'Test post {rand_string}' in the message input and click the Post button.\n3. Confirm the post 'Test post {rand_string}' appears in the feed.\n4. Click the Delete button next to that post to remove it.",
+    "success_criteria": "No posts yet.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "login_demo,activity_feed_lifecycle",
+    "model": "gpt-4o-mini",
+    "success_type": "text"
+  },
+  "quiz_all_correct": {
+    "prompt": "1. Log in with username 'demo' and password 'demo123'.\n2. On the home page, a math quiz is displayed. For each of the 4 questions, read the arithmetic question carefully and select the mathematically correct answer.\n   - The questions are simple arithmetic: addition, subtraction, multiplication, division.\n   - Each question has 4 answer buttons labelled A, B, C, D.\n   - Compute the correct answer and click the button that shows that number.\n3. After answering all 4 questions the quiz shows a summary.",
+    "success_criteria": "Overall result: Green success state.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "login_demo,quiz_all_correct",
+    "model": "gpt-4o-mini",
+    "success_type": "text"
+  },
+  "profile_all_fields": {
+    "prompt": "1. Log in with username 'demo' and password 'demo123'.\n2. Open Profile from the header.\n3. In the Display name field, enter: TestUser\n4. In the About me field, enter: {rand_string}\n5. In the Hometown field, enter: Portland\n6. In the Occupation field, enter: Engineer\n7. Click Save.\n8. Click Home in the header navigation.",
+    "success_criteria": "The home page shows 'Welcome, TestUser' in the welcome message.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "login_demo,profile_all_fields",
+    "model": "gpt-5.4-mini",
+    "success_type": "visual",
+    "max_subactions": 10
+  },
+  "profile_location_and_social": {
+    "prompt": "1. Register a new account with username user_{rand_string} and password pass1_{rand_string}.\n2. Open Profile from the header.\n3. Set the Country dropdown to 'United States of America'.\n4. Set the State dropdown to 'Oregon'.\n5. Scroll down to the Social Links section. In the GitHub field, enter: github.com/testuser\n6. Click Save.\n7. Reload the page.",
+    "success_criteria": "The Profile page shows Country 'United States of America', State 'Oregon', and GitHub link 'github.com/testuser' after reloading.",
+    "start_url": "http://127.0.0.1:8000/index.html",
+    "actions": "register_account,profile_open,profile_location_and_social",
+    "model": "gpt-4o-mini",
+    "success_type": "visual"
   }
 }

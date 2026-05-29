@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-import vision_playwright_openai_vision_poc as vp
+import agenticwebqa.engine as vp
 
 
 def _reset_logger() -> None:

@@ -1,6 +1,6 @@
 """
 Unit tests for deterministic success-check helpers in
-vision_playwright_openai_vision_poc.py.
+agenticwebqa.engine.py.
 
 Tests cover _check_text_present, _check_selector_present, _check_url_match,
 and check_deterministic_success dispatch via mocked Playwright Page objects.
@@ -12,8 +12,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-import vision_playwright_openai_vision_poc as poc
-from config_shared import SuccessIndicatorConfig, SuccessIndicatorType
+import agenticwebqa.engine as poc
+from agenticwebqa.config import SuccessIndicatorConfig, SuccessIndicatorType
 
 
 # ---------------------------------------------------------------------------

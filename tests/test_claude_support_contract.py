@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from config_shared import MODEL_OPTIONS, infer_model_provider, model_api_env_var
-from vision_playwright_openai_vision_poc import _coerce_openai_input_to_anthropic
+from agenticwebqa.config import MODEL_OPTIONS, infer_model_provider, model_api_env_var
+from agenticwebqa.engine import _coerce_openai_input_to_anthropic
 
 
 def test_model_options_include_multiple_claude_entries() -> None:

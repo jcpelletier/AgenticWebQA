@@ -74,14 +74,82 @@ python -m PyInstaller VisionLauncher.spec
 
 Output goes to `dist/VisionLauncher/` (build artifacts in `build/`).
 
-## Recommended Workflow
+## CI Workflow — Prove your feature works and keep it working
+
+AgenticWebQA is designed for CI-first use. The goal is to prove a feature works
+on every commit, with LLM costs paid once at authoring time and zero LLM cost
+on every subsequent CI replay.
+
+### How it works
+
+```
+Developer (local)                     CI pipeline (every commit)
+─────────────────────────             ──────────────────────────────────────────
+1. Write test spec in                 5. Restore Models/ from cache
+   tests_registry.json                6. Start app under test
+                                      7. Run each test:
+2. Run learn — LLM drives               • Model file exists?
+   the browser, saves                       → Playwright deterministic replay
+   Playwright actions to                    → No LLM calls, fast and cheap
+   Models/*.json                        • Model file missing or broken?
+                                            → LLM re-learns the action
+3. Verify replay — second run              → Test still passes
+   replays deterministically;          8. If any model changed THIS run:
+   no LLM calls                            → Open a draft PR with the diff
+
+4. Commit both:
+   tests_registry.json                Developer reviews PR, hits merge.
+   Models/                            Next run is deterministic again.
+```
+
+### What lives in source control
+
+| File | Purpose |
+|---|---|
+| `tests_registry.json` | Test specs: prompts, success criteria, action names, models |
+| `Models/*.json` | Learned Playwright action sequences — one file per base URL |
+
+Both are committed together. `Models/` is **not** a build output — it is source
+that travels with the test spec that generated it.
+
+### Setting up CI
+
+Use the `qa-ci-setup` Claude skill (part of the agentic-web-qa plugin) to
+generate a workflow config for your CI system. It reads `tests_registry.json`,
+detects your CI system, generates the correct workflow file, and configures
+model caching and the model-update PR bot.
+
+For GitHub Actions the generated workflow:
+- Caches `Models/` keyed on `tests_registry.json` — cache miss triggers a full re-learn
+- Runs each registered test as its own step (clear failure attribution)
+- Snapshots model state before tests run so the PR bot only fires when
+  **this run** re-learned something, not when cached models are simply
+  ahead of what is committed
+- Opens a draft PR if any model changed, targeting the branch that triggered
+  the run (feature branch or main)
+
+### The model drift PR
+
+When a UI change breaks a saved Playwright selector, this happens automatically:
+
+1. CI detects the selector failure
+2. Engine falls back to LLM, re-learns the action with the new selector
+3. Test **passes** — the run is not a failure
+4. A draft PR is opened: `model-update/run-N` → your branch
+5. The diff shows only JSON selector changes in `Models/`
+6. Developer reviews — if the changes match the intended UI update, merge
+
+If the diff is unexpected, **do not merge** — investigate whether the selector
+change indicates an unintended regression before accepting it.
+
+### Recommended Workflow
 
 The intended workflow is two-phase:
 
 1. LLM training runs (headed, best model).
    - Run prompts in primarily LLM mode to explore the site and learn reliable DOM hints.
    - This builds the site actions library automatically (`site_hints.json` and `Models/*.json`).
-   - Use the best available model here. Recommendation: `Sonnet 4.6`.
+   - Use the best available model here. Recommendation: `gpt-5.4` or `claude-opus-4-6`.
 2. Test execution runs (Playwright-first).
    - Re-run prompts and tests with the learned library in place.
    - Playwright handles stable steps, while the LLM can adapt to small UI changes without failing the current run.

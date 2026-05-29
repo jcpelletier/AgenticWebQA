@@ -96,8 +96,8 @@ def main() -> int:
                 "-m",
                 "pip",
                 "install",
-                "-r",
-                str(repo_root / "requirements.txt"),
+                "-e",
+                str(repo_root),
             ],
             cwd=repo_root,
         )
@@ -123,11 +123,11 @@ def main() -> int:
         print("== Wait for local test site ==")
         wait_for_site(START_URL, timeout_s=60)
 
-        script = repo_root / "vision_playwright_openai_vision_poc.py"
         cmd = [
             sys.executable,
             "-u",
-            str(script),
+            "-m",
+            "agenticwebqa",
             "--prompt",
             PROMPT,
             "--visual-llm-success",
