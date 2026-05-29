@@ -1,6 +1,10 @@
 *.log
 /agent_view/
-/Models/
+/dist/
+/build/
+*.egg-info/
+# Models/ is intentionally tracked — learned Playwright actions are source artifacts.
+# Commit them alongside tests_registry.json so CI can replay without re-learning.
 site_hints.json
 vision_playwright_openai_vision_ui.required.tmp
 __pycache__/

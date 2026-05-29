@@ -1,3 +1,46 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agenticwebqa"
+version = "0.2.0"
+description = "Vision + DOM hybrid browser QA agent: an LLM learns Playwright actions and heals when selectors change."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Joel Pelletier", email = "joel@jpelletier.com" }]
+keywords = ["qa", "testing", "playwright", "browser-automation", "e2e", "self-healing", "llm"]
+dependencies = [
+    "openai",
+    "anthropic",
+    "playwright",
+    "pillow",
+]
+
+[project.optional-dependencies]
+ui = ["ttkbootstrap"]
+mcp = ["mcp"]
+telemetry = ["azure-monitor-opentelemetry"]
+dev = ["pytest", "mypy", "ruff", "pyinstaller"]
+
+[project.scripts]
+agenticwebqa = "agenticwebqa.engine:main"
+agenticwebqa-gui = "agenticwebqa.gui:main"
+agenticwebqa-mcp = "agenticwebqa.mcp_server:main"
+agenticwebqa-run-test = "agenticwebqa.run_test:main"
+agenticwebqa-init = "agenticwebqa.init:main"
+
+[project.urls]
+Homepage = "https://github.com/jcpelletier/AgenticWebQA"
+Repository = "https://github.com/jcpelletier/AgenticWebQA"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+
 [tool.ruff]
 target-version = "py312"
 line-length = 88
@@ -34,4 +77,3 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = ["azure.*"]
 ignore_missing_imports = true
-
