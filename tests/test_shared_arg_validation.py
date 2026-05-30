@@ -2,7 +2,7 @@ import argparse
 
 import pytest
 
-from config_shared import add_shared_cli_arguments, parse_ui_value
+from agenticwebqa.config import add_shared_cli_arguments, parse_ui_value
 
 
 def _build_parser() -> argparse.ArgumentParser:

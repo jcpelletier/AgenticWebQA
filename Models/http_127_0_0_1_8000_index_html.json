@@ -1,0 +1,56 @@
+{
+  "functions": [
+    {
+      "description": "Log in with username and password credentials",
+      "examples": [
+        "Log in with username {query} and password 'demo123'.\n1. Fill in the username field\n2. Fill in the password field\n3. Click Log in"
+      ],
+      "fail_count": 0,
+      "inputs": [
+        "query"
+      ],
+      "name": "login_demo",
+      "postconditions": [
+        "User is authenticated and logged in"
+      ],
+      "preconditions": [
+        "Login page is loaded and accessible"
+      ],
+      "scope": "atomic",
+      "selectors": [
+        "[data-testid=\"username\"]",
+        "[data-testid=\"password\"]",
+        "[data-testid=\"login-button\"]"
+      ],
+      "site": "127.0.0.1",
+      "steps": [
+        {
+          "action": "click",
+          "selector": "[data-testid=\"username\"]"
+        },
+        {
+          "action": "type",
+          "text": "{query}"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"password\"]"
+        },
+        {
+          "action": "type",
+          "text": "{query}123"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"login-button\"]"
+        }
+      ],
+      "success_count": 11,
+      "tags": [
+        "search"
+      ]
+    }
+  ],
+  "prompt_routes": [],
+  "start_url": "http://127.0.0.1:8000/index.html"
+}

@@ -9,7 +9,7 @@ from typing import Callable, Dict, Protocol, Tuple, TYPE_CHECKING
 import tkinter as tk
 from tkinter import messagebox
 
-from config_shared import infer_model_provider, model_api_env_var
+from agenticwebqa.config import infer_model_provider, model_api_env_var
 
 from .ui_state import AppState, AIViewState, PromptTabsState
 
@@ -57,7 +57,6 @@ def build_run_lifecycle(
         Dict[str, object],
     ],
     build_command: Callable[[Dict[str, object], Path | None], list[str]],
-    script_path: Callable[[], Path],
     launch_command: LaunchCommand,
     poll_log: Callable[..., None],
     set_run_state: Callable[[bool], None],
@@ -76,10 +75,6 @@ def build_run_lifecycle(
         if app.process is not None:
             return
         apply_api_key()
-        target_script = script_path()
-        if not target_script.exists():
-            messagebox.showerror("Missing script", f"Script not found: {target_script}")
-            return
         (
             prompt_widget,
             success_widget,
@@ -156,7 +151,7 @@ def build_run_lifecycle(
             app.log_text.configure(state="disabled")
             app.step_training_signal_path = step_training_signal
             app.step_training_token = 0
-            app.process = launch_command(cmd, cwd=str(target_script.parent), env=env)
+            app.process = launch_command(cmd, cwd=os.getcwd(), env=env)
             set_run_state(True)
             threading.Thread(
                 target=_reader_thread, args=(app, app.process), daemon=True

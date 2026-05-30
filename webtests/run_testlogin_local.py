@@ -80,11 +80,11 @@ def run_agent_case(
     max_steps: int = 20,
     log_path: Path | None = None,
 ) -> None:
-    script = repo_root / "vision_playwright_openai_vision_poc.py"
     cmd = [
         sys.executable,
         "-u",
-        str(script),
+        "-m",
+        "agenticwebqa",
         "--prompt",
         prompt,
         "--visual-llm-success",
@@ -154,8 +154,8 @@ def main() -> int:
                 "-m",
                 "pip",
                 "install",
-                "-r",
-                str(repo_root / "requirements.txt"),
+                "-e",
+                str(repo_root),
             ],
             cwd=repo_root,
         )

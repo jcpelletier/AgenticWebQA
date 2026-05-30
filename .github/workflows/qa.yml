@@ -1,0 +1,173 @@
+name: QA Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:       # allow manual trigger from the Actions tab
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+
+    # All tests run from the repo root so that ./Models/ is where models land.
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+
+    env:
+      # run_test.py defaults to localhost — no override needed for CI.
+      # In Docker Compose this is overridden to http://test-site:8000.
+      TEST_SITE_URL: http://127.0.0.1:8000
+
+    steps:
+      # ── Setup ─────────────────────────────────────────────────────────────
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install agenticwebqa
+        run: pip install ".[mcp]"
+
+      - name: Install Playwright Chromium
+        run: playwright install chromium --with-deps
+
+      # ── Learned models ────────────────────────────────────────────────────
+      # Models are keyed on the registry content.  If tests_registry.json
+      # changes the cache misses and actions are re-learned from scratch.
+      # If the registry is unchanged but a UI change breaks a selector the
+      # cache still hits; the engine falls back to LLM and rewrites the model
+      # in-place.  Updated models are uploaded as an artifact at the end.
+
+      - name: Restore learned models
+        uses: actions/cache@v4
+        with:
+          path: Models/
+          key: agentqa-models-${{ hashFiles('tests_registry.json') }}
+          restore-keys: agentqa-models-
+
+      # ── Test site ─────────────────────────────────────────────────────────
+
+      - name: Start test-site
+        run: |
+          python -m http.server 8000 --directory test-site &
+          timeout 10 bash -c \
+            'until curl -sf http://127.0.0.1:8000/ > /dev/null; do sleep 0.3; done'
+          echo "test-site ready"
+
+      # Snapshot model state AFTER cache restore, BEFORE tests run.
+      # The PR step diffs against this — not git HEAD — so it only fires when
+      # THIS run actually re-learned something, not when the cache contains
+      # models that are newer than what is committed.
+      - name: Snapshot models before tests
+        run: |
+          if [ -d Models ]; then
+            cp -r Models .models-snapshot
+          else
+            mkdir -p .models-snapshot
+          fi
+
+      # ── Tests ─────────────────────────────────────────────────────────────
+      # Run in an order that lets later tests reuse models seeded by earlier
+      # ones (login_demo before profile_all_fields, register before profile_*).
+      # Each test is its own step so GitHub's UI shows exactly which one failed.
+
+      - name: Test — login_demo
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: agenticwebqa-run-test login_demo
+
+      - name: Test — register
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: agenticwebqa-run-test register
+
+      - name: Test — login_invalid_credentials
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: agenticwebqa-run-test login_invalid_credentials
+
+      - name: Test — unauthenticated_redirect
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: agenticwebqa-run-test unauthenticated_redirect
+
+      - name: Test — logout
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: agenticwebqa-run-test logout
+
+      - name: Test — profile_about_edit
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: agenticwebqa-run-test profile_about_edit
+
+      - name: Test — profile_all_fields
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: agenticwebqa-run-test profile_all_fields
+
+      - name: Test — profile_location_and_social
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: agenticwebqa-run-test profile_location_and_social
+
+      - name: Test — activity_feed_lifecycle
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: agenticwebqa-run-test activity_feed_lifecycle
+
+      # ── Model update PR ───────────────────────────────────────────────────
+      # If THIS run re-learned any action model (a UI change broke a selector),
+      # open a draft PR so a developer can review the diff and hit merge.
+      # Uses a before/after snapshot — not git diff — so cached-but-uncommitted
+      # models from a previous run don't trigger a false PR.
+
+      - name: Propose model updates if actions changed
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! diff -rq .models-snapshot Models/ > /dev/null 2>&1; then
+            BRANCH="model-update/run-${{ github.run_number }}"
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git checkout -b "$BRANCH"
+            git add Models/
+            git commit -m "chore: update learned action models [skip ci]
+
+            Playwright actions re-learned during CI run ${{ github.run_id }}.
+            Tests passed — review the Models/ diff and merge to accept."
+            git push origin "$BRANCH"
+            gh pr create \
+              --title "chore: update learned action models" \
+              --body "## What happened
+
+          One or more Playwright action models were re-learned during [run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+          The tests **passed** — the engine detected a broken selector, fell back to the LLM, rewrote the action steps, and the test succeeded with the updated selectors.
+
+          ## What to do
+
+          Review the \`Models/\` diff in this PR. Changes are JSON selector sequences — look for CSS selector or step-order updates that match your recent UI work. If they look correct, **merge this PR** to keep the updated actions in source control.
+
+          If the diff looks unexpected, investigate before merging." \
+              --base "${{ github.ref_name }}" \
+              --draft
+          fi

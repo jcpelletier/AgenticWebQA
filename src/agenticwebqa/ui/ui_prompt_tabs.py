@@ -7,7 +7,7 @@ from tkinter import messagebox, simpledialog
 
 import ttkbootstrap as ttk
 
-from config_shared import DEFAULT_MODEL, MODEL_OPTIONS
+from agenticwebqa.config import DEFAULT_MODEL, MODEL_OPTIONS
 from .ui_state import PromptTabsState
 
 LABEL_WIDTH = 18

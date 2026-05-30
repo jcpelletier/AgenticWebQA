@@ -1,4 +1,4 @@
-from config_shared import infer_model_provider, model_api_env_var
+from agenticwebqa.config import infer_model_provider, model_api_env_var
 
 
 def test_free_form_model_inference():

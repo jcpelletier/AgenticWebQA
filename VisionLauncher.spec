@@ -2,13 +2,10 @@
 
 
 a = Analysis(
-    ['vision_playwright_openai_vision_ui.py'],
-    pathex=[],
+    ['src/agenticwebqa/gui.py'],
+    pathex=['src'],
     binaries=[],
-    datas=[
-        ("vision_playwright_openai_vision_poc.py", "."),
-        ("cli_entry.py", "."),
-    ],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

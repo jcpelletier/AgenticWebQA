@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from cli_entry import parse_cli_args
-import vision_playwright_openai_vision_poc as poc
+from agenticwebqa.cli import parse_cli_args
+import agenticwebqa.engine as poc
 
 
 class _DummyPage:

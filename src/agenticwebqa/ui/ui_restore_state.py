@@ -6,7 +6,7 @@ from typing import Callable, Dict, Protocol, TYPE_CHECKING
 import tkinter as tk
 import tkinter.font as tkfont
 
-from config_shared import DEFAULT_MODEL
+from agenticwebqa.config import DEFAULT_MODEL
 from .ui_prompt_tabs import SUCCESS_TYPE_DEFAULT
 from .ui_state import PromptTabsState
 

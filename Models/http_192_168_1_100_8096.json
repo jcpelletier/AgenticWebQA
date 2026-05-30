@@ -1,0 +1,58 @@
+{
+  "functions": [
+    {
+      "description": "Log in with username and password",
+      "examples": [
+        "1. Select Username field\n2. Input Automation\n3. Select Password field\n4. Input ajkgf*346\n5. Click the Sign In button"
+      ],
+      "fail_count": 0,
+      "inputs": [
+        "username",
+        "password"
+      ],
+      "name": "login",
+      "postconditions": [
+        "User is authenticated and redirected to main page"
+      ],
+      "preconditions": [
+        "Login form is visible"
+      ],
+      "scope": "atomic",
+      "selectors": [
+        "#txtManualName",
+        "#txtManualPassword",
+        "role:button name:Sign In"
+      ],
+      "site": "192.168.1.100",
+      "steps": [
+        {
+          "action": "click",
+          "selector": "#txtManualName"
+        },
+        {
+          "action": "type",
+          "text": "{username}"
+        },
+        {
+          "action": "click",
+          "selector": "#txtManualPassword"
+        },
+        {
+          "action": "type",
+          "text": "{password}"
+        },
+        {
+          "action": "click",
+          "name": "Sign In",
+          "role": "button"
+        }
+      ],
+      "success_count": 0,
+      "tags": [
+        "login"
+      ]
+    }
+  ],
+  "prompt_routes": [],
+  "start_url": "http://192.168.1.100:8096/"
+}

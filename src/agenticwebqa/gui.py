@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tkinter launcher for vision_playwright_openai_vision_poc.py.
+Tkinter launcher for the AgenticWebQA engine.
 Builds a full CLI argument list and spawns the main script.
 """
 
@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
 
 import tkinter as tk
-from config_shared import (
+from agenticwebqa.config import (
     DEFAULT_MODEL,
     build_shared_ui_defaults,
     build_shared_ui_cli_args,
@@ -35,16 +35,19 @@ except ModuleNotFoundError:
         ) from exc
 from tkinter import messagebox
 
-from ui.ui_actions_library import build_actions_library_tab, refresh_actions_list
-from ui.ui_app import build_root_layout
-from ui.ui_ai_view import (
+from agenticwebqa.ui.ui_actions_library import (
+    build_actions_library_tab,
+    refresh_actions_list,
+)
+from agenticwebqa.ui.ui_app import build_root_layout
+from agenticwebqa.ui.ui_ai_view import (
     build_ai_view_tab,
     clear_agent_view_images,
     list_ai_images,
     poll_ai_view,
     refresh_ai_view,
 )
-from ui.ui_prompt_tabs import (
+from agenticwebqa.ui.ui_prompt_tabs import (
     SUCCESS_LABEL_TO_ARG,
     SUCCESS_TYPE_DEFAULT,
     build_prompt_tabs_panel,
@@ -56,25 +59,25 @@ from ui.ui_prompt_tabs import (
     get_tab_display_name,
     set_prompt_running_visual,
 )
-from ui.ui_info_bar import build_info_bar_controller
-from ui.ui_run_control import (
+from agenticwebqa.ui.ui_info_bar import build_info_bar_controller
+from agenticwebqa.ui.ui_run_control import (
     build_credentials_tab,
     build_run_button_bar,
     build_run_log_panel,
 )
-from ui.ui_run_lifecycle import build_run_lifecycle
-from ui.ui_restore_state import (
+from agenticwebqa.ui.ui_run_lifecycle import build_run_lifecycle
+from agenticwebqa.ui.ui_restore_state import (
     RestoreContext,
     apply_initial_window_layout,
     restore_ui_state,
 )
-from ui.ui_settings_tabs import (
+from agenticwebqa.ui.ui_settings_tabs import (
     build_action_settings_tab,
     build_browser_tab,
     build_output_tab,
     build_tokens_tab,
 )
-from ui.ui_state import AppState, PromptTabsState
+from agenticwebqa.ui.ui_state import AppState, PromptTabsState
 
 
 REQUIRED_STATE_PATH = (
@@ -191,10 +194,6 @@ def _get_api_key_status() -> Tuple[str, str]:
     return "MISSING", "red"
 
 
-def _script_path() -> Path:
-    return Path(__file__).resolve().parent / "vision_playwright_openai_vision_poc.py"
-
-
 def _load_required_state() -> Dict[str, object]:
     try:
         if REQUIRED_STATE_PATH.exists():
@@ -230,7 +229,8 @@ def _build_command(
     args: List[str] = [
         sys.executable,
         "-u",
-        str(_script_path()),
+        "-m",
+        "agenticwebqa",
         "--prompt",
         prompt,
         success_flag,
@@ -606,7 +606,6 @@ def main() -> None:
         get_active_prompt_fields=_get_active_prompt_fields,
         collect_values=_collect_values,
         build_command=_build_command,
-        script_path=_script_path,
         launch_command=_launch_command,
         poll_log=_poll_log,
         set_run_state=_set_run_state,

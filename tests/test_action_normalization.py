@@ -1,4 +1,4 @@
-from vision_playwright_openai_vision_poc import (
+from agenticwebqa.engine import (
     _merge_existing_action_with_fallback_steps,
     _normalize_action_args_for_schema,
     normalize_openai_action_input,

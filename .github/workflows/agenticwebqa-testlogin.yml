@@ -49,7 +49,7 @@ jobs:
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r .\requirements.txt
+          python -m pip install -e ".[dev,ui,mcp]"
           python -m playwright install chromium
 
       - name: Run formatting, type checks, and unit tests
@@ -108,7 +108,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          python -u .\vision_playwright_openai_vision_poc.py `
+          python -u -m agenticwebqa `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
             --visual-llm-success "You are on the Home page and see 'Welcome, demo'." `
             --start-url "http://127.0.0.1:8000/index.html" `
@@ -150,7 +150,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          python -u .\vision_playwright_openai_vision_poc.py `
+          python -u -m agenticwebqa `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
             --visual-llm-success "You are on the Home page and see 'Welcome, demo'." `
             --start-url "http://127.0.0.1:8000/index.html" `
@@ -172,7 +172,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          python -u .\vision_playwright_openai_vision_poc.py `
+          python -u -m agenticwebqa `
             --prompt "Log in with username 'demo' and password 'demo123'.`n1. Fill in the username field`n2. Fill in the password field`n3. Click Log in" `
             --visual-llm-success "You are on the Home page and see 'Welcome, demo'." `
             --start-url "http://127.0.0.1:8000/index.html" `

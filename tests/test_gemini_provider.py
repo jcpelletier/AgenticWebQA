@@ -3,14 +3,14 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
-from config_shared import (
+from agenticwebqa.config import (
     GEMINI_BASE_URL,
     GEMINI_MODEL_OPTIONS,
     MODEL_OPTIONS,
     infer_model_provider,
     model_api_env_var,
 )
-import vision_playwright_openai_vision_poc as poc
+import agenticwebqa.engine as poc
 
 
 # ---------------------------------------------------------------------------
@@ -134,7 +134,7 @@ def test_new_model_client_non_gemini_unchanged() -> None:
 
 def test_appstate_has_gemini_key_var_field() -> None:
     import dataclasses
-    from ui.ui_state import AppState
+    from agenticwebqa.ui.ui_state import AppState
 
     field_names = {f.name for f in dataclasses.fields(AppState)}
     assert "gemini_key_var" in field_names, "AppState is missing 'gemini_key_var' field"
@@ -146,8 +146,8 @@ def test_run_lifecycle_rejects_missing_gemini_key(
     """build_run_lifecycle must not launch when Gemini model selected and key is empty."""
     import tkinter as tk
     from unittest.mock import MagicMock
-    from ui.ui_run_lifecycle import build_run_lifecycle
-    from ui.ui_state import AppState
+    from agenticwebqa.ui.ui_run_lifecycle import build_run_lifecycle
+    from agenticwebqa.ui.ui_state import AppState
 
     # A real Tk root is required before creating tk.StringVar instances.
     tk_root = tk.Tk()
@@ -173,7 +173,7 @@ def test_run_lifecycle_rejects_missing_gemini_key(
 
         error_shown: list[str] = []
 
-        import ui.ui_run_lifecycle as lifecycle_mod
+        import agenticwebqa.ui.ui_run_lifecycle as lifecycle_mod
 
         monkeypatch.setattr(
             lifecycle_mod.messagebox,
@@ -222,7 +222,6 @@ def test_run_lifecycle_rejects_missing_gemini_key(
             get_active_prompt_fields=_fake_get_fields,
             collect_values=_fake_collect,
             build_command=_fake_build_cmd,
-            script_path=lambda: MagicMock(__class__=MagicMock, exists=lambda: True),
             launch_command=_fake_launch,
             poll_log=lambda *a, **kw: None,
             set_run_state=lambda r: None,

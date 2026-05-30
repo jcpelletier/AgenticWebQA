@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CLI composition helpers for vision_playwright_openai_vision_poc.
+CLI composition helpers for the AgenticWebQA engine.
 """
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ from pathlib import Path
 import re
 from typing import Callable, Optional, Sequence
 
-from config_shared import (
+from agenticwebqa.config import (
     SuccessIndicatorConfig,
     SuccessIndicatorType,
     add_shared_cli_arguments,

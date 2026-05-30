@@ -1,0 +1,13 @@
+{
+  "name": "agentic-web-qa",
+  "description": "Self-healing, LLM-driven web QA. Author resilient browser tests that learn Playwright actions on first run, replay them without the LLM, and heal automatically when selectors change. Bundles QA workflow skills and an MCP server that drives the AgenticWebQA engine.",
+  "version": "0.2.0",
+  "author": {
+    "name": "Joel Pelletier",
+    "email": "joel@jpelletier.com"
+  },
+  "homepage": "https://github.com/jcpelletier/AgenticWebQA",
+  "repository": "https://github.com/jcpelletier/AgenticWebQA",
+  "license": "MIT",
+  "keywords": ["qa", "testing", "playwright", "browser-automation", "e2e", "self-healing"]
+}
